@@ -4,6 +4,10 @@ Project page for a radix-4 Booth multiply-accumulate (MAC) unit integrated into 
 
 **Live page:** https://mohsin2240.github.io/rv32-booth-mac/
 
+- **Submitted by:** Mohsin Mushtaq (2025MECECS001), Mubashir Karim Ganaie (2025MECECS005)
+- **Submitted to:** Dr. Afshan Amin Khan
+- **Department:** Department of Electronics and Communications, National Institute of Technology Srinagar
+
 The page includes:
 - the pipeline architecture, with the MAC unit spanning the EX and MEM stages;
 - an interactive floorplan of the placed and routed designs on the ECP5 die, with per-block layers, routing density, the critical path, zoom, pan and a mini-map;
