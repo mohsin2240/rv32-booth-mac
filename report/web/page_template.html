@@ -1,0 +1,770 @@
+<title>RV32 Booth-MAC Core</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: "die shot meets datasheet" - a 12-column, 1200px grid on a
+   wafer-dark ground. The floorplan is the luminous hero object; everything
+   around it is set like a quiet, tabular datasheet. Copper is the accent,
+   bond-pad gold marks the critical path and key figures. */
+:root{
+  --wafer:#090c11; --panel:#0f141b; --panel-2:#141b24; --rule:#212b37; --rule-2:#2c3846;
+  --fg:#e8ecf1; --body:#c3ccd7; --muted:#8e9aab; --faint:#5b6777;
+  --copper:#c47a42; --copper-hi:#e8a873; --gold:#efd596;
+  --pass:#7cc6a4; --info:#e6c06a;
+  --f-display:"Newsreader", "Iowan Old Style", Georgia, serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-label:"IBM Plex Sans Condensed", "Arial Narrow", "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --s-1:.75rem; --s-2:.875rem; --s-3:1rem; --s-4:1.125rem; --s-5:1.5rem; --s-6:2.25rem; --s-7:clamp(2.2rem,4.4vw,3.5rem);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--wafer);color:var(--body);font:var(--s-3)/1.65 var(--f-body)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:20;background:var(--wafer)}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:0 24px}
+a{color:var(--copper-hi);text-underline-offset:3px;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--copper-hi);outline-offset:2px}
+h1,h2,h3{margin:0;color:var(--fg);font-family:var(--f-display);font-weight:400;text-wrap:balance}
+h2{font-size:var(--s-6);line-height:1.1;letter-spacing:-.005em}
+h3{font-size:var(--s-5);line-height:1.2}
+p{margin:0;max-width:66ch}
+em{font-style:italic;color:var(--copper-hi)}
+code{font:.86em var(--f-mono);color:var(--fg);background:var(--panel-2);padding:1px 5px;border-radius:3px}
+.label{font:600 var(--s-1)/1.2 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:color-mix(in srgb,var(--wafer) 86%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.top .wrap{display:flex;align-items:center;gap:24px;padding-block:12px}
+.brand{font:500 var(--s-4) var(--f-display);color:var(--fg);margin-right:auto;display:flex;align-items:center;gap:10px}
+.brand i{width:12px;height:12px;border:1px solid var(--copper);display:inline-block;box-shadow:inset 0 0 0 2px var(--wafer),inset 0 0 0 6px var(--copper)}
+.top nav{display:flex;gap:20px}
+.top nav a{font:600 var(--s-1) var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.top nav a:hover{color:var(--fg)}
+
+/* hero */
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--rule)}
+.hero canvas{position:absolute;top:0;right:0;width:64%;height:100%;
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 30%),linear-gradient(to top,transparent 0,#000 22%);
+  -webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0,#000 30%),linear-gradient(to top,transparent 0,#000 22%);mask-composite:intersect}
+.hero .wrap{position:relative;padding-block:88px 72px}
+.hero-text{grid-column:1 / span 7;display:grid;gap:22px}
+.crumb{font:var(--s-1) var(--f-mono);color:var(--faint);letter-spacing:.02em}
+.hero h1{font-size:var(--s-7);line-height:1.02;letter-spacing:-.015em}
+.lead{font-size:var(--s-4);color:var(--body);max-width:52ch}
+.chain{display:flex;flex-wrap:wrap;gap:6px 14px;font:var(--s-1) var(--f-mono);color:var(--copper-hi)}
+.chain span+span::before{content:"→";color:var(--faint);margin-right:14px}
+.credits{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 18px;margin:4px 0 0;padding-top:18px;border-top:1px solid var(--rule-2);max-width:52ch;font-size:var(--s-2)}
+.credits dt{font:600 var(--s-1)/1.9 var(--f-label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.credits dd{margin:0;color:var(--fg);text-shadow:0 1px 12px rgba(9,12,17,.9)}
+.credits .roll{font:var(--s-1) var(--f-mono);color:var(--copper-hi);margin-left:6px}
+.hero-legend{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:16px;font:var(--s-1) var(--f-mono);color:var(--faint)}
+
+/* datasheet spec table */
+.sheet{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--rule-2);margin-top:-1px}
+.cell{padding:18px 18px 20px 0;border-bottom:1px solid var(--rule);display:grid;gap:6px;min-width:0}
+.cell+.cell{padding-left:18px;border-left:1px solid var(--rule)}
+.cell:nth-child(4n+1){padding-left:0;border-left:0}
+.cell b{font:500 1.6rem/1.1 var(--f-mono);color:var(--fg);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cell b small{font-size:.9rem;font-weight:400;color:var(--muted);margin-left:4px}
+.cell span.note{font-size:var(--s-2);color:var(--faint)}
+
+section.block{padding-block:72px 8px;display:grid;gap:28px}
+.head{display:grid;gap:12px}
+.head p{color:var(--muted)}
+
+/* toolchain */
+.tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--rule)}
+.tools div{padding:14px 18px 14px 0;border-bottom:1px solid var(--rule);display:grid;gap:4px;min-width:0}
+.tools div span:last-child{color:var(--body);font-size:var(--s-2)}
+
+/* architecture */
+.diagram{overflow-x:auto;border:1px solid var(--rule);background:var(--panel);border-radius:4px}
+.diagram svg{display:block;width:100%;min-width:680px;height:auto}
+.arch-cols{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:40px}
+.memmap{width:100%;border-collapse:collapse;font-size:var(--s-2)}
+.memmap td{padding:10px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.memmap td:first-child{font-family:var(--f-mono);color:var(--copper-hi);white-space:nowrap;padding-right:18px;width:1%}
+.choices{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.choices li{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;padding-bottom:16px;border-bottom:1px solid var(--rule)}
+.choices li:last-child{border-bottom:0;padding-bottom:0}
+.choices b{font:600 var(--s-1)/1.5 var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--fg)}
+
+/* floorplan */
+.fp{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start}
+.scope{display:grid;gap:10px;min-width:0}
+.scopebar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--rule-2);border-radius:4px;overflow:hidden}
+.seg button{font:600 var(--s-1) var(--f-label);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:transparent;border:0;padding:8px 14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule-2)}
+.seg button[aria-pressed="true"]{background:var(--copper);color:var(--wafer)}
+.readout{font:var(--s-1) var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.readout b{color:var(--gold);font-weight:500}
+.viewer{position:relative;aspect-ratio:127/96;max-width:100%;background:var(--wafer);border:1px solid var(--rule-2);touch-action:none;cursor:grab;overflow:hidden}
+.viewer.drag{cursor:grabbing}
+.viewer>canvas{display:block;width:100%;height:100%}
+.tick{position:absolute;width:14px;height:14px;border-color:var(--copper);border-style:solid;pointer-events:none;opacity:.85}
+.tick.tl{top:6px;left:6px;border-width:1px 0 0 1px}.tick.tr{top:6px;right:6px;border-width:1px 1px 0 0}
+.tick.bl{bottom:6px;left:6px;border-width:0 0 1px 1px}.tick.br{bottom:6px;right:6px;border-width:0 1px 1px 0}
+.zoom{position:absolute;top:16px;right:16px;display:flex;flex-direction:column;border:1px solid var(--rule-2);border-radius:4px;overflow:hidden;background:color-mix(in srgb,var(--panel-2) 90%,transparent)}
+.zoom button{width:34px;height:32px;border:0;background:transparent;color:var(--fg);font:500 var(--s-3) var(--f-mono);cursor:pointer}
+.zoom button+button{border-top:1px solid var(--rule-2)}
+.zoom button:hover{color:var(--copper-hi)}
+.mini{position:absolute;right:16px;bottom:16px;width:158px;aspect-ratio:127/96;border:1px solid var(--rule-2);background:var(--wafer);cursor:crosshair}
+.mini canvas{display:block;width:100%;height:100%}
+.tip{position:absolute;pointer-events:none;background:var(--panel-2);border:1px solid var(--rule-2);padding:8px 10px;font:var(--s-1)/1.5 var(--f-mono);color:var(--fg);white-space:nowrap;z-index:2}
+.tip em{font-style:normal;color:var(--gold)}
+.caption{font-size:var(--s-2);color:var(--body);min-height:3.4em;border-left:2px solid var(--copper);padding-left:14px}
+.caption b{color:var(--fg);font-weight:500}
+
+.layers{border:1px solid var(--rule-2);background:var(--panel);border-radius:4px;display:grid}
+.layers .lh{display:flex;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--rule)}
+.layer{display:grid;grid-template-columns:22px 12px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--rule)}
+.layer:last-child{border-bottom:0}
+.layer input{appearance:none;width:16px;height:16px;border:1px solid var(--rule-2);border-radius:3px;margin:0;cursor:pointer;display:grid;place-content:center;background:var(--wafer)}
+.layer input:checked::after{content:"";width:8px;height:8px;background:var(--copper-hi);border-radius:1px}
+.layer .sw{width:12px;height:12px;border-radius:2px}
+.layer button{all:unset;cursor:pointer;font:500 var(--s-2) var(--f-body);color:var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.layer button:focus-visible{outline:2px solid var(--copper-hi);outline-offset:2px}
+.layer button[aria-pressed="true"]{color:var(--gold)}
+.layer .ct{font:var(--s-1) var(--f-mono);color:var(--faint)}
+.layer.on{background:var(--panel-2)}
+
+.fpstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--rule)}
+.fpstats div{padding:14px 18px 14px 0;display:grid;gap:4px;min-width:0}
+.fpstats div+div{padding-left:18px;border-left:1px solid var(--rule)}
+.fpstats b{font:500 1.15rem var(--f-mono);color:var(--fg);font-variant-numeric:tabular-nums}
+.cp{display:grid;gap:8px}
+.cpbar{display:flex;height:8px;background:var(--panel-2)}
+.cpbar span{display:block;height:100%}
+.cpkey{display:flex;gap:18px;flex-wrap:wrap;font:var(--s-1) var(--f-mono);color:var(--muted)}
+.cpkey i{display:inline-block;width:10px;height:3px;margin-right:6px;vertical-align:middle}
+
+/* sign-off table */
+.tablewrap{overflow-x:auto;border-top:1px solid var(--rule-2)}
+table.signoff{width:100%;border-collapse:collapse;font-size:var(--s-2);min-width:600px}
+.signoff th{font:600 var(--s-1) var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:12px 16px 12px 0;border-bottom:1px solid var(--rule-2)}
+.signoff td{padding:13px 16px 13px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.signoff td:first-child{color:var(--fg)}
+.pill{display:inline-block;font:500 var(--s-1) var(--f-mono);padding:2px 9px;border-radius:999px;border:1px solid;white-space:nowrap}
+.pill.pass{color:var(--pass);border-color:color-mix(in srgb,var(--pass) 45%,transparent);background:color-mix(in srgb,var(--pass) 8%,transparent)}
+.pill.info{color:var(--info);border-color:color-mix(in srgb,var(--info) 45%,transparent);background:color-mix(in srgb,var(--info) 8%,transparent)}
+
+/* performance chart */
+.chart{display:grid;gap:14px}
+.crow{display:grid;grid-template-columns:150px minmax(0,1fr) 190px;gap:16px;align-items:center}
+.crow .nm{font:500 var(--s-2) var(--f-body);color:var(--fg)}
+.crow .nm small{display:block;font:var(--s-1) var(--f-mono);color:var(--faint)}
+.track{position:relative;height:26px}
+.track .gl{position:absolute;top:-6px;bottom:-6px;width:1px;background:var(--rule)}
+.track .fill{position:absolute;inset:0 auto 0 0;border-radius:0 2px 2px 0}
+.crow .vl{font:var(--s-2) var(--f-mono);color:var(--body);font-variant-numeric:tabular-nums}
+.crow .vl b{color:var(--fg);font-weight:500}
+.axis{position:relative;height:18px;font:var(--s-1) var(--f-mono);color:var(--faint)}
+.axis span{position:absolute;transform:translateX(-50%)}
+.axis span:first-child{transform:none}
+
+/* notes */
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px;border-top:1px solid var(--rule)}
+.note{display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px;padding-block:26px;border-bottom:1px solid var(--rule)}
+.pull{font:500 1.7rem/1.1 var(--f-mono);color:var(--gold);font-variant-numeric:tabular-nums}
+.pull small{display:block;margin-top:6px;font:600 var(--s-1) var(--f-label);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.note h3{font-size:1.3rem;margin-bottom:8px}
+.note p{font-size:var(--s-2);color:var(--muted)}
+
+footer{margin-top:72px;border-top:1px solid var(--rule)}
+footer .wrap{padding-block:28px 48px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font:var(--s-1) var(--f-mono);color:var(--faint)}
+
+@media (max-width:980px){
+  .hero-text{grid-column:1 / span 9}
+  .fp{grid-template-columns:minmax(0,1fr)}
+  .layers{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .layers .lh{grid-column:1 / -1}
+  .layer{border-right:1px solid var(--rule)}
+  .arch-cols{grid-template-columns:minmax(0,1fr)}
+  .notes{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:700px){
+  .top nav{display:none}
+  /* phones: the die sits behind the text, dimmed and fading to the ground */
+  .hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.42;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 40%,transparent 100%);mask-image:linear-gradient(to bottom,#000 0,#000 40%,transparent 100%);mask-composite:add}
+  .hero .wrap{padding-block:64px 48px}
+  .hero h1,.hero .lead{text-shadow:0 1px 14px rgba(9,12,17,.9)}
+  .hero-text{grid-column:1 / -1}
+  .hero-legend{display:none}
+  .sheet{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cell:nth-child(4n+1){padding-left:18px;border-left:1px solid var(--rule)}
+  .cell:nth-child(2n+1){padding-left:0;border-left:0}
+  .cell b{font-size:1.3rem}
+  .tools{grid-template-columns:minmax(0,1fr)}
+  .fpstats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fpstats div:nth-child(3){padding-left:0;border-left:0}
+  .layers{grid-template-columns:minmax(0,1fr)}
+  .layer{border-right:0}
+  .mini{width:96px;right:10px;bottom:10px}
+  .crow{grid-template-columns:minmax(0,1fr);gap:6px}
+  .note{grid-template-columns:minmax(0,1fr);gap:10px}
+  .choices li{grid-template-columns:minmax(0,1fr);gap:4px}
+  section.block{padding-block:56px 8px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><i aria-hidden="true"></i>RV32 Booth-MAC Core</div>
+    <nav aria-label="Sections">
+      <a href="#architecture">Architecture</a>
+      <a href="#floorplan">Floorplan</a>
+      <a href="#signoff">Sign-off</a>
+      <a href="#performance">Performance</a>
+      <a href="#notes">Notes</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <canvas id="hero" aria-hidden="true"></canvas>
+    <div class="wrap grid">
+      <div class="hero-text">
+        <div class="crumb">projects / digital design / riscv-mac</div>
+        <h1>A Booth multiply‑accumulate unit, <em>inside</em> a five‑stage RISC‑V core</h1>
+        <p class="lead">A custom-0 MAC extension with a 64-bit saturating accumulator and Q15 read-out, built on a radix-4 Booth multiplier, integrated into a pipelined RV32IM processor and taken from Verilog to a routed FPGA with open-source tools.</p>
+        <div class="chain"><span>Verilog-2005</span><span>Icarus Verilog</span><span>Yosys 0.70</span><span>nextpnr-ecp5</span><span>LFE5U-85F</span></div>
+        <dl class="credits">
+          <dt>Submitted by</dt><dd>Mohsin Mushtaq <span class="roll">2025MECECS001</span><br>Mubashir Karim Ganaie <span class="roll">2025MECECS005</span></dd>
+          <dt>Submitted to</dt><dd>Dr. Afshan Amin Khan</dd>
+          <dt>Department</dt><dd>Electronics and Communications, NIT Srinagar</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="hero-legend">placed &amp; routed core · ECP5 tiles X0–55, Y0–27</div>
+  </div>
+
+  <div class="wrap">
+    <div class="sheet" role="list" aria-label="Key figures">
+      <div class="cell" role="listitem"><span class="label">Core Fmax</span><b>34.6<small>MHz</small></b><span class="note">post-route, speed grade 6</span></div>
+      <div class="cell" role="listitem"><span class="label">MAC unit Fmax</span><b>56.4<small>MHz</small></b><span class="note">78.8 MHz on DSP blocks</span></div>
+      <div class="cell" role="listitem"><span class="label">Logic cells</span><b>7,566</b><span class="note">9.0 % of the device</span></div>
+      <div class="cell" role="listitem"><span class="label">Generic gates</span><b>25,286</b><span class="note">core + MAC, 2-input cells</span></div>
+      <div class="cell" role="listitem"><span class="label">FIR speed-up</span><b>2.67<small>×</small></b><span class="note">unrolled, vs RV32IM</span></div>
+      <div class="cell" role="listitem"><span class="label">Best CPI</span><b>1.037</b><span class="note">unrolled MAC FIR</span></div>
+      <div class="cell" role="listitem"><span class="label">Unit-level checks</span><b>88,896</b><span class="note">0 errors</span></div>
+      <div class="cell" role="listitem"><span class="label">FIR output</span><b>128<small>/ 128</small></b><span class="note">bit-exact vs golden</span></div>
+    </div>
+
+    <section class="block" aria-labelledby="tools-h">
+      <div class="head"><span class="label">Toolchain</span><h2 id="tools-h">Open-source, end to end</h2></div>
+      <div class="tools">
+        <div><span class="label">RTL</span><span>Verilog-2005, Icarus Verilog 12, GTKWave</span></div>
+        <div><span class="label">Software</span><span>Project assembler in Python; RV32IM + custom-0 programs</span></div>
+        <div><span class="label">Synthesis</span><span>Yosys 0.70, generic gates and <code>synth_ecp5</code></span></div>
+        <div><span class="label">Place and route</span><span>nextpnr-ecp5 on LFE5U-85F, CABGA756</span></div>
+        <div><span class="label">Gate-level sim</span><span>Yosys netlist on the unchanged testbench, zero-delay</span></div>
+        <div><span class="label">Figures</span><span>netlistsvg schematics, trace-based pipeline charts</span></div>
+      </div>
+    </section>
+
+    <section class="block" id="architecture" aria-labelledby="arch-h">
+      <div class="head"><span class="label">Architecture</span><h2 id="arch-h">The MAC unit rides the pipeline</h2>
+        <p>The MAC unit's two internal registers line up with the core's EX/MEM and MEM/WB registers, so a <code>mac</code> moves down the pipeline like any other instruction and writes back in WB.</p></div>
+      <div class="diagram">
+        <svg viewBox="0 0 1000 300" role="img" aria-label="Five-stage pipeline IF, ID, EX, MEM, WB with the MAC unit spanning EX and MEM">
+          <defs>
+            <marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8e9aab"/></marker>
+            <marker id="arc" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#e8a873"/></marker>
+            <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#141b24"/><line x1="0" y1="0" x2="0" y2="6" stroke="#2c3846" stroke-width="2"/></pattern>
+          </defs>
+          <g font-family="IBM Plex Sans Condensed, Arial Narrow, sans-serif" font-size="11" letter-spacing="1.3" fill="#8e9aab">
+            <text x="40" y="34">1 · IF</text><text x="232" y="34">2 · ID</text><text x="424" y="34">3 · EX</text><text x="616" y="34">4 · MEM</text><text x="808" y="34">5 · WB</text>
+          </g>
+          <g fill="#0f141b" stroke="#2c3846">
+            <rect x="40" y="48" width="150" height="128" rx="3"/><rect x="232" y="48" width="150" height="128" rx="3"/>
+            <rect x="424" y="48" width="150" height="128" rx="3"/><rect x="616" y="48" width="150" height="128" rx="3"/>
+            <rect x="808" y="48" width="150" height="128" rx="3"/>
+          </g>
+          <g fill="url(#hatch)" stroke="#3a4757">
+            <rect x="200" y="44" width="22" height="210"/><rect x="392" y="44" width="22" height="210"/>
+            <rect x="584" y="44" width="22" height="210"/><rect x="776" y="44" width="22" height="210"/>
+          </g>
+          <g font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#5b6777" text-anchor="middle">
+            <text x="211" y="270">IF/ID</text><text x="403" y="270">ID/EX</text><text x="595" y="270">EX/MEM</text><text x="787" y="270">MEM/WB</text>
+          </g>
+          <g font-family="Newsreader, Georgia, serif" font-size="19" fill="#e8ecf1">
+            <text x="56" y="80">Fetch</text><text x="248" y="80">Decode</text><text x="440" y="80">Execute</text><text x="632" y="80">Memory</text><text x="824" y="80">Write-back</text>
+          </g>
+          <g font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="#8e9aab">
+            <text x="56" y="104">PC + 4 KiB I-mem</text><text x="56" y="122">next PC / target</text>
+            <text x="248" y="104">decode, immediates</text><text x="248" y="122">reg file + bypass</text><text x="248" y="140">hazard unit</text>
+            <text x="440" y="104">forwarding muxes</text><text x="440" y="122">ALU, 33×33 RV32M</text><text x="440" y="140">branch resolve</text>
+            <text x="632" y="104">16 KiB D-mem</text><text x="632" y="122">byte / half / word</text>
+            <text x="824" y="104">ALU, load or MAC</text><text x="824" y="122">result → rd</text>
+          </g>
+          <rect x="424" y="196" width="342" height="54" rx="3" fill="#1b140e" stroke="#c47a42"/>
+          <line x1="595" y1="196" x2="595" y2="250" stroke="#c47a42" stroke-dasharray="3 3"/>
+          <g font-family="IBM Plex Sans Condensed, sans-serif" font-size="11" letter-spacing="1.2" fill="#e8a873">
+            <text x="438" y="216">MAC STAGE 1</text><text x="610" y="216">MAC STAGE 2</text>
+          </g>
+          <g font-family="IBM Plex Sans, sans-serif" font-size="11.5" fill="#c3ccd7">
+            <text x="438" y="236">decode + Booth 34×34</text><text x="610" y="236">ACC64 ± · saturate · Q15</text>
+          </g>
+          <path d="M 499 48 C 499 18, 115 18, 115 44" fill="none" stroke="#e8a873" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#arc)"/>
+          <text x="300" y="16" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#e8a873">taken branch → PC, flush 2</text>
+          <path d="M 883 176 L 883 286 L 470 286 L 470 252" fill="none" stroke="#8e9aab" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#ar)"/>
+          <text x="640" y="281" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#8e9aab">WB → EX forwarding</text>
+        </svg>
+      </div>
+      <div class="arch-cols">
+        <div style="display:grid;gap:12px;min-width:0">
+          <span class="label">Memory map</span>
+          <table class="memmap">
+            <tr><td>0x0000_0000</td><td>Instruction memory, 4 KiB, loaded from the program image</td></tr>
+            <tr><td>0x0001_0000</td><td>Data memory, 16 KiB, byte enables</td></tr>
+            <tr><td>custom-0</td><td><code>mac</code> <code>msu</code> <code>mul.acc</code> <code>macu</code> <code>rdacc.lo</code> <code>rdacc.hi</code> <code>rdacc.q15</code> <code>clracc</code></td></tr>
+          </table>
+        </div>
+        <div style="display:grid;gap:12px;min-width:0">
+          <span class="label">Design choices</span>
+          <ul class="choices">
+            <li><b>Accumulator</b><span>A dedicated 64-bit register keeps full precision for 32×32 products with only two register-file read ports.</span></li>
+            <li><b>Saturation</b><span>Signed MACs clamp to the INT64 limits and set a sticky flag; <code>rdacc.q15</code> turns Q30 into Q15 in one instruction.</span></li>
+            <li><b>Hazards</b><span>Only a consumer placed directly after a MAC result waits one cycle, exactly like a load; the value then comes from WB.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="floorplan" aria-labelledby="fp-h">
+      <div class="head"><span class="label">Floorplan</span><h2 id="fp-h">Every placed cell on the die</h2>
+        <p>Cells from nextpnr coloured by block, over a copper routing-density map. The view opens framed on the logic; zoom out with − for the whole die and ⤢ to come back. Drag to pan, Ctrl/⌘ + scroll to zoom, hover a tile to see what is in it.</p></div>
+      <div class="fp">
+        <div class="scope">
+          <div class="scopebar">
+            <div class="seg" role="group" aria-label="Design">
+              <button type="button" id="tab-core" data-design="core" aria-pressed="true">Full core</button>
+              <button type="button" id="tab-booth" data-design="mac_booth" aria-pressed="false">MAC · Booth</button>
+              <button type="button" id="tab-dsp" data-design="mac_dsp" aria-pressed="false">MAC · DSP</button>
+            </div>
+            <div class="readout" id="readout">X <b>—</b> · Y <b>—</b> · zoom <b>1.0×</b></div>
+          </div>
+          <div class="viewer" id="viewer">
+            <canvas id="fp" aria-label="FPGA floorplan of the selected design"></canvas>
+            <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
+            <div class="zoom">
+              <button type="button" id="zin" aria-label="Zoom in" title="Zoom in">+</button>
+              <button type="button" id="zout" aria-label="Zoom out" title="Zoom out">−</button>
+              <button type="button" id="zreset" aria-label="Fit to design" title="Fit to design">⤢</button>
+            </div>
+            <div class="mini" id="mini" title="Whole die; click to move the view"><canvas id="minic" aria-hidden="true"></canvas></div>
+            <div class="tip" id="tip" hidden></div>
+          </div>
+          <p class="caption" id="caption"></p>
+          <div class="fpstats">
+            <div><span class="label">Fmax</span><b id="s-fmax"></b></div>
+            <div><span class="label">Critical path</span><b id="s-cp"></b></div>
+            <div><span class="label">Logic cells</span><b id="s-cells"></b></div>
+            <div><span class="label">Flip-flops</span><b id="s-ff"></b></div>
+          </div>
+          <div class="cp">
+            <span class="label">Critical path: logic vs routing delay</span>
+            <div class="cpbar" id="cpbar"></div>
+            <div class="cpkey"><span><i style="background:var(--pass)"></i>logic</span><span><i style="background:var(--copper)"></i>routing</span><span id="cp-ends"></span></div>
+          </div>
+        </div>
+        <div class="layers" id="layers" role="group" aria-label="Layers"></div>
+      </div>
+    </section>
+
+    <section class="block" id="signoff" aria-labelledby="so-h">
+      <div class="head"><span class="label">Sign-off</span><h2 id="so-h">Every check has its own script</h2>
+        <p>The unit testbenches compare against an independent reference model; the processor runs real RISC-V programs and compares every output sample bit by bit.</p></div>
+      <div class="tablewrap">
+        <table class="signoff">
+          <thead><tr><th>Check</th><th>Result</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Booth multiplier</td><td><span class="pill pass">85,545 · 0 err</span></td><td>All 65,536 8-bit pairs, 34-bit corners and 20,000 random pairs</td></tr>
+            <tr><td>MAC unit testbench</td><td><span class="pill pass">3,351 · 0 err</span></td><td>13 test groups; scoreboard on rd, ACC, OVF and 2-cycle latency</td></tr>
+            <tr><td>Gate-level netlist</td><td><span class="pill pass">pass</span></td><td>Yosys netlist on the same testbench, zero-delay</td></tr>
+            <tr><td><code>isa_test</code> on the core</td><td><span class="pill pass">18 / 18</span></td><td>Every instruction class, forwarding, load-use and MAC-use stalls</td></tr>
+            <tr><td>FIR programs, 4 versions</td><td><span class="pill pass">128 / 128 exact</span></td><td>Unwanted tone −60.1 dB against a design value of −60.2 dB</td></tr>
+            <tr><td>Mutation tests</td><td><span class="pill pass">all caught</span></td><td>Broken saturation, WB forwarding and stall logic each fail the tests</td></tr>
+            <tr><td>Yosys <code>check -assert</code></td><td><span class="pill pass">0 issues</span></td><td>No latches, loops or undriven nets; 179 flip-flops match the RTL</td></tr>
+            <tr><td>Timing, core at 50 MHz target</td><td><span class="pill info">34.6 MHz</span></td><td>Critical path through the single-cycle RV32M multiplier</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block" id="performance" aria-labelledby="perf-h">
+      <div class="head"><span class="label">Performance</span><h2 id="perf-h">Same filter, two instruction sets</h2>
+        <p>A 16-tap Q15 low-pass FIR over 128 samples, measured with the core's cycle counters. All four versions produce the same bit-exact output.</p></div>
+      <div class="chart" id="chart"></div>
+      <p style="color:var(--muted);font-size:var(--s-2)">One <code>mac</code> replaces the six-instruction 64-bit multiply-accumulate sequence, and <code>rdacc.q15</code> replaces a 14-instruction shift-and-saturate routine.</p>
+    </section>
+
+    <section class="block" id="notes" aria-labelledby="notes-h">
+      <div class="head"><span class="label">Notes from the build</span><h2 id="notes-h">What the numbers taught</h2></div>
+      <div class="notes">
+        <article class="note">
+          <div class="pull">28.9 ns<small>core critical path</small></div>
+          <div><h3>The multiply that sets the clock</h3><p>The pipelined MAC unit is not the slowest path. It runs from WB forwarding, through the forwarding mux and the single-cycle RV32M multiplier on four DSP blocks, into EX/MEM; 18.9 ns of it is routing. Pipelining <code>mul</code> the way the MAC unit already is would be the next timing fix.</p></div>
+        </article>
+        <article class="note">
+          <div class="pull">−7,109<small>gates saved</small></div>
+          <div><h3>One multiplier instead of three</h3><p>Separate 64-bit products for <code>MUL</code>, <code>MULH</code>, <code>MULHSU</code> and <code>MULHU</code>, plus a register file with a reset, made the first core 22,412 gates. One shared 33×33 multiplier and a reset-free register file in LUT-RAM brought it to 15,303 with identical results.</p></div>
+        </article>
+        <article class="note">
+          <div class="pull">79 %<small>of MAC gates</small></div>
+          <div><h3>Where the Booth area goes</h3><p>The Booth multiplier is most of the stand-alone MAC unit and the routing hot spot on the die. Yosys' own Booth and Wallace-tree generator saves 21 % of the gates but keeps the same 127-level depth, because the ripple-carry final adder sets it.</p></div>
+        </article>
+        <article class="note">
+          <div class="pull">1.59× → 2.67×<small>looped → unrolled</small></div>
+          <div><h3>What's next</h3><p>Post-increment loads and a hardware loop would let looped DSP code reach unrolled speed. After that: a parallel-prefix adder for the Booth multiplier, a pipelined RV32M multiplier, block-RAM memories and a run on a real ECP5 board.</p></div>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap"><span>Mohsin Mushtaq &amp; Mubashir Karim Ganaie · supervised by Dr. Afshan Amin Khan · Dept. of Electronics and Communications, NIT Srinagar</span><span>Every number here comes from the project's simulation logs and nextpnr reports.</span></div>
+</footer>
+
+<script id="fp-data" type="application/json">__DATA__</script>
+<script>
+(function(){
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("fp-data").textContent);
+  var W = DATA.die.w, H = DATA.die.h, S = 10;
+  // one retuned material family for the block layers
+  var COL = {booth:"#e2a35a", mac:"#63b7d6", core:"#8fbf9a", rf:"#b9a3d6", dsp:"#e07a6e", wrap:"#8b95a5", io:"#cdbb98"};
+  var groups = DATA.groups.map(function(g){ return {id:g.id, label:g.label, color:COL[g.id] || g.color}; });
+  var byKey = {}; DATA.designs.forEach(function(d){ byKey[d.key] = d; });
+  var BG = [9,12,17];
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var NOTES = {
+    booth:"<b>Booth multiplier.</b> The radix-4 recoders and partial-product adders that feed the stage-1 product register. The densest block on the die and the routing hot spot.",
+    mac:"<b>MAC stage 2 + control.</b> Decoder, 65-bit adder and subtractor, saturation, the Q15 converter and the 64-bit accumulator.",
+    core:"<b>RV32 pipeline + RV32M.</b> Fetch, decode, forwarding, ALU, branch logic and the shared 33×33 multiplier.",
+    rf:"<b>Register file.</b> 32 × 32-bit, mapped to LUT-RAM because it has no reset.",
+    wrap:"<b>Timing wrapper.</b> Registers on every input and output, so all paths are register to register as they are inside a processor.",
+    dsp:"<b>DSP multipliers.</b> MULT18X18D hard blocks: the RV32M multiplier in the core, the MAC multiplier in the DSP variant.",
+    io:"<b>I/O pads.</b> The block is synthesised with its ports on pins, so the pad ring is used; in a real SoC these would be internal.",
+    routing:"<b>Routing density.</b> Routed wire segments per tile on a log scale. It peaks over the multiplier.",
+    crit:"<b>Critical path.</b> The slowest register-to-register path, drawn cell to cell from start (dot) to end (star). The real wires follow the routing grid, so they are longer than the line."
+  };
+  var CP_DESC = {core:"WB forwarding → RV32M multiplier → EX/MEM",
+    mac_booth:"operand register → Booth multiplier → s1_prod", mac_dsp:"operand register → DSP multiplier → s1_prod"};
+
+  function rgbOf(hex){ var n=parseInt(hex.slice(1),16); return [n>>16&255,n>>8&255,n&255]; }
+  function mix(a,b,t){ return [a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t]; }
+  function css(c,a){ return "rgba("+Math.round(c[0])+","+Math.round(c[1])+","+Math.round(c[2])+","+(a==null?1:a)+")"; }
+  function gid(t){ return groups[t[2]].id; }
+
+  // Paint a die render of design d into canvas cnv (S px per tile).
+  // o: {focus, hidden:{}, routing:bool, rowLimit:number}
+  function paint(cnv, d, o){
+    var b = cnv.getContext("2d");
+    b.fillStyle = css(BG); b.fillRect(0,0,cnv.width,cnv.height);
+    b.fillStyle = "rgba(255,255,255,0.028)";
+    for (var x=0;x<=W;x++) b.fillRect(x*S,0,1,cnv.height);
+    for (var y=0;y<=H;y++) b.fillRect(0,y*S,cnv.width,1);
+    var lim = o.rowLimit == null ? 1e9 : o.rowLimit;
+    if (o.routing){
+      var dmax = 1; d.density.forEach(function(q){ if(q[2]>dmax) dmax=q[2]; });
+      var fr = o.focus === "routing";
+      d.density.forEach(function(q){
+        if (q[1] > lim) return;
+        var a = (fr?0.95:0.6) * Math.log(1+q[2]) / Math.log(1+dmax);
+        if (o.focus && !fr) a *= 0.4;
+        b.fillStyle = "rgba(196,122,66,"+a.toFixed(3)+")"; b.fillRect(q[0]*S, q[1]*S, S, S);
+      });
+    }
+    d.tiles.forEach(function(t){
+      var id = gid(t);
+      if (o.hidden[id] || t[1] > lim) return;
+      var x0 = t[0]*S+1, y0 = t[1]*S+1, w = S-2;
+      var dim = o.focus && o.focus !== id && o.focus !== "routing" && o.focus !== "crit";
+      if (dim){ b.fillStyle = "rgba(120,132,148,0.13)"; b.fillRect(x0,y0,w,w); return; }
+      var c = rgbOf(COL[id] || "#888888"), f = 0.5 + 0.5*Math.min(1, t[3]/16);
+      if (o.focus === id) f = 1;
+      var body = mix(BG, c, f);
+      b.fillStyle = css(body); b.fillRect(x0,y0,w,w);
+      if (id === "io") return;
+      b.fillStyle = css(mix(body,[255,255,255],0.35)); b.fillRect(x0,y0,w,1); b.fillRect(x0,y0,1,w);
+      b.fillStyle = css(mix(body,[0,0,0],0.4)); b.fillRect(x0,y0+w-1,w,1); b.fillRect(x0+w-1,y0,1,w);
+      if (o.focus === id){ b.fillStyle = "rgba(255,255,255,0.18)"; b.fillRect(x0+2,y0+2,w-4,1); }
+    });
+    // seal ring
+    b.strokeStyle = "#3d2f22"; b.lineWidth = 4; b.strokeRect(2,2,cnv.width-4,cnv.height-4);
+    b.strokeStyle = "#7a5a3c"; b.lineWidth = 1; b.strokeRect(6.5,6.5,cnv.width-13,cnv.height-13);
+  }
+
+  function pct(a,q){ a=a.slice().sort(function(x,y){return x-y;}); return a[Math.min(a.length-1,Math.floor(q*(a.length-1)))]; }
+  function designBox(d){
+    var xs=[], ys=[];
+    d.tiles.forEach(function(t){ if (gid(t)!=="io"){ xs.push(t[0]); ys.push(t[1]); } });
+    var b = {x0:pct(xs,.03), x1:pct(xs,.97), y0:pct(ys,.03), y1:pct(ys,.97)};
+    d.crit.path.forEach(function(q){ b.x0=Math.min(b.x0,q[0]); b.x1=Math.max(b.x1,q[0]); b.y0=Math.min(b.y0,q[1]); b.y1=Math.max(b.y1,q[1]); });
+    b.x0-=2; b.y0-=2; b.x1+=3; b.y1+=3; return b;
+  }
+
+  function star(ctx,x,y,r1,r2){ ctx.beginPath(); for (var i=0;i<10;i++){ var r=i%2?r2:r1, a=-Math.PI/2+i*Math.PI/5; ctx.lineTo(x+r*Math.cos(a), y+r*Math.sin(a)); } ctx.closePath(); ctx.fill(); }
+  // draw the critical path; map(px,py)->[sx,sy]; frac = portion drawn
+  function drawCrit(ctx, d, map, dpr, alpha, frac){
+    var p = d.crit.path, n = Math.max(1, Math.round((p.length-1)*frac)+1);
+    ctx.lineJoin = "round"; ctx.lineCap = "round";
+    [[7*dpr,"rgba(239,213,150,"+(0.28*alpha)+")"],[1.6*dpr,"rgba(255,248,232,"+(0.95*alpha)+")"]].forEach(function(st){
+      ctx.beginPath(); ctx.lineWidth = st[0]; ctx.strokeStyle = st[1];
+      for (var i=0;i<n;i++){ var c = map((p[i][0]+0.5)*S,(p[i][1]+0.5)*S); if(i) ctx.lineTo(c[0],c[1]); else ctx.moveTo(c[0],c[1]); }
+      ctx.stroke();
+    });
+    var a = map((p[0][0]+0.5)*S,(p[0][1]+0.5)*S);
+    ctx.fillStyle = "rgba(255,255,255,"+alpha+")"; ctx.beginPath(); ctx.arc(a[0],a[1],3.5*dpr,0,7); ctx.fill();
+    if (frac >= 1){ var z = map((p[p.length-1][0]+0.5)*S,(p[p.length-1][1]+0.5)*S); ctx.fillStyle = "rgba(239,213,150,"+alpha+")"; star(ctx,z[0],z[1],8*dpr,3.2*dpr); }
+  }
+
+  /* ---------------- hero: static crop with one fab-in moment ---------------- */
+  var heroC = document.getElementById("hero"), heroBase = document.createElement("canvas");
+  heroBase.width = W*S; heroBase.height = H*S;
+  var heroD = byKey.core, heroBox = designBox(heroD), heroT0 = null;
+  function heroCrop(cw,ch){
+    var x0=(heroBox.x0-6)*S, x1=(heroBox.x1+10)*S, y0=(heroBox.y0-2)*S, y1=(heroBox.y1+4)*S;
+    var w=x1-x0, h=y1-y0, ar=cw/ch;
+    if (w/h < ar){ var nw=h*ar; x0-=(nw-w)/2; w=nw; } else { var nh=w/ar; y0-=(nh-h)/2; h=nh; }
+    x0=Math.max(0,Math.min(heroBase.width-w,x0)); y0=Math.max(0,Math.min(heroBase.height-h,y0));
+    w=Math.min(w,heroBase.width); h=Math.min(h,heroBase.height);
+    return [x0,y0,w,h];
+  }
+  function heroFrame(rowLimit, frac){
+    var dpr = window.devicePixelRatio||1, r = heroC.getBoundingClientRect();
+    if (!r.width) return;
+    var cw = Math.round(r.width*dpr), ch = Math.round(r.height*dpr);
+    if (heroC.width !== cw || heroC.height !== ch){ heroC.width = cw; heroC.height = ch; }
+    paint(heroBase, heroD, {hidden:{io:false}, routing:true, rowLimit:rowLimit});
+    var g = heroC.getContext("2d"), c = heroCrop(cw,ch), k = cw/c[2];
+    g.imageSmoothingEnabled = false;
+    g.fillStyle = css(BG); g.fillRect(0,0,cw,ch);
+    g.drawImage(heroBase, c[0],c[1],c[2],c[3], 0,0,cw,ch);
+    if (frac > 0) drawCrit(g, heroD, function(px,py){ return [(px-c[0])*k,(py-c[1])*k]; }, dpr, 0.9, frac);
+  }
+  function heroAnim(ts){
+    if (heroT0 === null) heroT0 = ts;
+    var t = ts - heroT0, rows = -1 + (heroBox.y1+6) * Math.min(1, t/600), frac = Math.max(0, Math.min(1, (t-600)/520));
+    heroFrame(t < 600 ? rows : 1e9, frac);
+    if (t < 1120) requestAnimationFrame(heroAnim);
+  }
+
+  /* ---------------- floorplan viewer ---------------- */
+  var cv = document.getElementById("fp"), ctx = cv.getContext("2d");
+  var viewer = document.getElementById("viewer"), tip = document.getElementById("tip");
+  var mini = document.getElementById("minic"), miniBox = document.getElementById("mini");
+  var base = document.createElement("canvas"); base.width = W*S; base.height = H*S;
+  var cur = byKey.core, focus = null, hidden = {}, showRouting = true, showCrit = true;
+  var view = {k:1,x:0,y:0}, moved = false;
+
+  function bscale(){ return Math.min(cv.width/base.width, cv.height/base.height); }
+  function origin(){ var bs=bscale(); return [(cv.width-base.width*bs)/2,(cv.height-base.height*bs)/2]; }
+  function toScreen(px,py){ var bs=bscale(), o=origin(); return [view.x + view.k*(o[0]+px*bs), view.y + view.k*(o[1]+py*bs)]; }
+  function toBase(sx,sy){ var bs=bscale(), o=origin(); return [((sx-view.x)/view.k - o[0])/bs, ((sy-view.y)/view.k - o[1])/bs]; }
+
+  function niceTiles(px){ var c=[1,2,5,10,20,50], best=1; c.forEach(function(n){ if (n*px <= 110*(window.devicePixelRatio||1)) best=n; }); return best; }
+
+  function render(){
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.fillStyle = css(BG); ctx.fillRect(0,0,cv.width,cv.height);
+    var bs = bscale(), o = toScreen(0,0), dpr = window.devicePixelRatio||1;
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(base, o[0], o[1], base.width*bs*view.k, base.height*bs*view.k);
+    if (showCrit) drawCrit(ctx, cur, toScreen, dpr, (!focus || focus==="crit") ? 1 : 0.35, 1);
+    // scale bar
+    var tilePx = S*bs*view.k, n = niceTiles(tilePx), len = n*tilePx, x = 18*dpr, y = cv.height - 20*dpr;
+    ctx.strokeStyle = "rgba(232,236,241,0.75)"; ctx.lineWidth = 1*dpr; ctx.beginPath();
+    ctx.moveTo(x, y-4*dpr); ctx.lineTo(x, y); ctx.lineTo(x+len, y); ctx.lineTo(x+len, y-4*dpr); ctx.stroke();
+    ctx.fillStyle = "rgba(232,236,241,0.75)"; ctx.font = (10.5*dpr)+"px 'IBM Plex Mono', monospace";
+    ctx.fillText(n+(n===1?" tile":" tiles"), x, y-8*dpr);
+    renderMini();
+    document.getElementById("readout").innerHTML = readText(lastXY);
+  }
+
+  function renderMini(){
+    var r = miniBox.getBoundingClientRect(), dpr = window.devicePixelRatio||1;
+    if (!r.width) return;
+    var mw = Math.round(r.width*dpr), mh = Math.round(r.height*dpr);
+    if (mini.width !== mw || mini.height !== mh){ mini.width = mw; mini.height = mh; }
+    var m = mini.getContext("2d"); m.imageSmoothingEnabled = true;
+    m.drawImage(base, 0,0, mw, mh);
+    var a = toBase(0,0), z = toBase(cv.width, cv.height), sx = mw/base.width, sy = mh/base.height;
+    var x0 = Math.max(0,a[0])*sx, y0 = Math.max(0,a[1])*sy, x1 = Math.min(base.width,z[0])*sx, y1 = Math.min(base.height,z[1])*sy;
+    m.strokeStyle = "#e8a873"; m.lineWidth = 1.5*dpr; m.strokeRect(x0+0.5, y0+0.5, Math.max(2,x1-x0-1), Math.max(2,y1-y0-1));
+  }
+
+  var lastXY = null;
+  function readText(xy){
+    return "X <b>"+(xy?xy[0]:"—")+"</b> · Y <b>"+(xy?xy[1]:"—")+"</b> · zoom <b>"+view.k.toFixed(1)+"×</b>";
+  }
+
+  function clampView(){
+    var bs = bscale(), o = origin(), k = view.k, dw = base.width*bs*k, dh = base.height*bs*k;
+    if (k <= 1){ view.x = 0; view.y = 0; return; }
+    view.x = Math.min(-k*o[0], Math.max(cv.width - dw - k*o[0], view.x));
+    view.y = Math.min(-k*o[1], Math.max(cv.height - dh - k*o[1], view.y));
+  }
+  function fitDesign(){
+    var b = designBox(cur), bs = bscale(), o = origin();
+    var k = Math.max(1, Math.min(16, Math.min(cv.width/((b.x1-b.x0)*S*bs), cv.height/((b.y1-b.y0)*S*bs))));
+    var cx = (b.x0+b.x1)/2*S, cy = (b.y0+b.y1)/2*S;
+    view = {k:k, x: cv.width/2 - k*(cx*bs+o[0]), y: cv.height/2 - k*(cy*bs+o[1])};
+    clampView(); moved = false; render();
+  }
+  function zoomAt(f,cx,cy){
+    var k = Math.max(1, Math.min(16, view.k*f)); f = k/view.k;
+    view.x = cx - (cx-view.x)*f; view.y = cy - (cy-view.y)*f; view.k = k;
+    clampView(); moved = true; render();
+  }
+  function fit(){
+    var r = viewer.getBoundingClientRect(), dpr = window.devicePixelRatio||1;
+    cv.width = Math.round(r.width*dpr); cv.height = Math.round(r.height*dpr);
+    if (moved){ clampView(); render(); } else fitDesign();
+  }
+  function rebuild(){ paint(base, cur, {focus:focus, hidden:hidden, routing:showRouting}); }
+
+  /* layer panel */
+  function layers(){
+    var box = document.getElementById("layers");
+    var rows = groups.filter(function(g){ return cur.counts[g.id]; })
+      .map(function(g){ return {id:g.id, label:g.label, color:g.color, count:cur.counts[g.id].toLocaleString()}; });
+    rows.push({id:"routing", label:"Routing density", color:"#b87333", count:""});
+    rows.push({id:"crit", label:"Critical path", color:"#efd596", count:cur.crit.total.toFixed(2)+" ns"});
+    box.innerHTML = '<div class="lh"><span class="label">Layers</span><span class="label">cells</span></div>';
+    rows.forEach(function(rw){
+      var vis = rw.id==="routing" ? showRouting : rw.id==="crit" ? showCrit : !hidden[rw.id];
+      var el = document.createElement("div"); el.className = "layer" + (focus===rw.id ? " on" : "");
+      el.innerHTML = '<input type="checkbox" id="vis-'+rw.id+'" aria-label="Show '+rw.label+'"'+(vis?" checked":"")+'>'+
+        '<span class="sw" style="background:'+rw.color+'"></span>'+
+        '<button type="button" id="hl-'+rw.id+'" aria-pressed="'+(focus===rw.id)+'" title="Highlight '+rw.label+'">'+rw.label+'</button>'+
+        '<span class="ct">'+rw.count+'</span>';
+      el.querySelector("input").addEventListener("change", function(e){
+        if (rw.id==="routing") showRouting = e.target.checked;
+        else if (rw.id==="crit") showCrit = e.target.checked;
+        else hidden[rw.id] = !e.target.checked;
+        rebuild(); render();
+      });
+      el.querySelector("button").addEventListener("click", function(){ focus = focus===rw.id ? null : rw.id; update(); });
+      box.appendChild(el);
+    });
+    document.getElementById("caption").innerHTML = focus ? NOTES[focus] :
+      "<b>"+cur.title+".</b> Critical path: "+CP_DESC[cur.key]+". Pick a layer to highlight it; untick it to hide it.";
+  }
+
+  function stats(){
+    var u = cur.util, t = cur.crit.total;
+    document.getElementById("s-fmax").textContent = cur.fmax.toFixed(1)+" MHz";
+    document.getElementById("s-cp").textContent = t.toFixed(2)+" ns";
+    document.getElementById("s-cells").textContent = u.TRELLIS_COMB[0].toLocaleString()+" · "+(100*u.TRELLIS_COMB[0]/u.TRELLIS_COMB[1]).toFixed(1)+"%";
+    document.getElementById("s-ff").textContent = u.TRELLIS_FF[0].toLocaleString();
+    document.getElementById("cpbar").innerHTML = '<span style="width:'+(100*cur.crit.logic/t)+'%;background:var(--pass)"></span><span style="width:'+(100*cur.crit.routing/t)+'%;background:var(--copper)"></span>';
+    document.getElementById("cp-ends").textContent = "logic "+cur.crit.logic.toFixed(1)+" ns · routing "+cur.crit.routing.toFixed(1)+" ns · "+cur.crit.path.length+" segments";
+  }
+
+  function update(){ rebuild(); layers(); stats(); render(); }
+
+  document.querySelectorAll(".seg button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".seg button").forEach(function(o){ o.setAttribute("aria-pressed", String(o===b)); });
+      cur = byKey[b.dataset.design]; focus = null; hidden = {}; update(); fitDesign();
+    });
+  });
+  function centre(){ return [cv.width/2, cv.height/2]; }
+  document.getElementById("zin").addEventListener("click", function(){ var c=centre(); zoomAt(1.5,c[0],c[1]); });
+  document.getElementById("zout").addEventListener("click", function(){ var c=centre(); zoomAt(1/1.5,c[0],c[1]); });
+  document.getElementById("zreset").addEventListener("click", fitDesign);
+  miniBox.addEventListener("click", function(e){
+    var r = miniBox.getBoundingClientRect(), px = (e.clientX-r.left)/r.width*base.width, py = (e.clientY-r.top)/r.height*base.height;
+    if (view.k <= 1) view.k = 3;
+    var bs = bscale(), o = origin();
+    view.x = cv.width/2 - view.k*(o[0]+px*bs); view.y = cv.height/2 - view.k*(o[1]+py*bs);
+    clampView(); moved = true; render();
+  });
+
+  function local(e){ var r=cv.getBoundingClientRect(), dpr=window.devicePixelRatio||1; return [(e.clientX-r.left)*dpr,(e.clientY-r.top)*dpr]; }
+  cv.addEventListener("wheel", function(e){
+    if (!(e.ctrlKey || e.metaKey)) return;
+    e.preventDefault(); var p = local(e); zoomAt(e.deltaY<0?1.2:1/1.2, p[0], p[1]);
+  }, {passive:false});
+
+  var ptrs = {}, last = null, pinch = null;
+  cv.addEventListener("pointerdown", function(e){ cv.setPointerCapture(e.pointerId); ptrs[e.pointerId]=local(e); last=local(e); viewer.classList.add("drag"); });
+  cv.addEventListener("pointermove", function(e){
+    var p = local(e);
+    if (ptrs[e.pointerId]){
+      ptrs[e.pointerId] = p;
+      var ids = Object.keys(ptrs);
+      if (ids.length === 2){
+        var a=ptrs[ids[0]], b=ptrs[ids[1]], dd=Math.hypot(a[0]-b[0],a[1]-b[1]);
+        if (pinch) zoomAt(dd/pinch, (a[0]+b[0])/2, (a[1]+b[1])/2);
+        pinch = dd;
+      } else if (last && view.k > 1){
+        view.x += p[0]-last[0]; view.y += p[1]-last[1]; clampView(); moved = true; render();
+      }
+      last = p; tip.hidden = true; return;
+    }
+    var bp = toBase(p[0],p[1]), tx = Math.floor(bp[0]/S), ty = Math.floor(bp[1]/S);
+    lastXY = (tx>=0 && tx<W && ty>=0 && ty<H) ? [tx,ty] : null;
+    document.getElementById("readout").innerHTML = readText(lastXY);
+    var mixT = cur.tileMix[tx+","+ty];
+    if (!mixT){ tip.hidden = true; return; }
+    var lines = ['<em>X'+tx+' · Y'+ty+'</em>'];
+    Object.keys(mixT).sort(function(a,b){ return mixT[b]-mixT[a]; }).forEach(function(k){
+      var g = groups.filter(function(x){ return x.id===k; })[0]; lines.push(g.label+"  "+mixT[k]);
+    });
+    tip.innerHTML = lines.join("<br>");
+    var r = viewer.getBoundingClientRect(), dpr = window.devicePixelRatio||1, lx = p[0]/dpr+14, ly = p[1]/dpr+14;
+    tip.hidden = false;
+    if (lx + tip.offsetWidth > r.width - 8) lx = p[0]/dpr - tip.offsetWidth - 10;
+    if (ly + tip.offsetHeight > r.height - 8) ly = p[1]/dpr - tip.offsetHeight - 10;
+    tip.style.left = lx+"px"; tip.style.top = ly+"px";
+  });
+  function up(e){ delete ptrs[e.pointerId]; if (Object.keys(ptrs).length<2) pinch=null; if (!Object.keys(ptrs).length){ last=null; viewer.classList.remove("drag"); } }
+  cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+  cv.addEventListener("pointerleave", function(){ tip.hidden = true; lastXY = null; document.getElementById("readout").innerHTML = readText(null); });
+
+  /* performance chart: one linear scale, 0 to 35,000 cycles */
+  var MAXC = 35000, TICKS = [0,10000,20000,30000];
+  var perf = [
+    ["RV32IM loop","12 instr / tap",31363,"#4c5868"],
+    ["MAC loop","7 instr / tap",19724,"#c47a42"],
+    ["RV32IM unrolled","8 instr / tap",19203,"#4c5868"],
+    ["MAC unrolled","3 instr / tap",7180,"#e8a873"]
+  ];
+  var chart = document.getElementById("chart");
+  perf.forEach(function(p){
+    var row = document.createElement("div"); row.className = "crow";
+    var gl = TICKS.map(function(t){ return '<span class="gl" style="left:'+(100*t/MAXC)+'%"></span>'; }).join("");
+    row.innerHTML = '<span class="nm">'+p[0]+'<small>'+p[1]+'</small></span>'+
+      '<div class="track">'+gl+'<div class="fill" style="width:'+(100*p[2]/MAXC)+'%;background:'+p[3]+'"></div></div>'+
+      '<span class="vl"><b>'+p[2].toLocaleString()+'</b> cyc · '+(p[2]/2048).toFixed(2)+' / tap</span>';
+    chart.appendChild(row);
+  });
+  var ax = document.createElement("div"); ax.className = "crow";
+  ax.innerHTML = '<span></span><div class="axis">'+TICKS.map(function(t){ return '<span style="left:'+(100*t/MAXC)+'%">'+(t/1000)+'k</span>'; }).join("")+'</div><span class="vl" style="color:var(--faint)">clock cycles</span>';
+  chart.appendChild(ax);
+  var sp = document.createElement("p"); sp.style.cssText = "font-size:var(--s-2);color:var(--muted)";
+  sp.innerHTML = 'Speed-up with the MAC instructions: <b style="color:var(--gold);font-weight:500">1.59×</b> looped and <b style="color:var(--gold);font-weight:500">2.67×</b> unrolled, with 2.6× smaller code. Unrolled MAC code runs at CPI 1.037.';
+  chart.appendChild(sp);
+
+  window.addEventListener("resize", function(){ fit(); heroFrame(1e9, 1); });
+  update(); fit();
+  // the fab-in plays once; a timer guarantees the finished frame even when
+  // animation frames are throttled (background tab, preview, thumbnail)
+  if (reduce) heroFrame(1e9, 1);
+  else { requestAnimationFrame(heroAnim); setTimeout(function(){ heroFrame(1e9, 1); }, 1400); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ render(); });
+})();
+</script>

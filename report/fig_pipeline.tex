@@ -1,0 +1,85 @@
+% ===========================================================================
+% fig_pipeline.tex - 5-stage RV32IM pipeline with the integrated MAC unit
+% (included from report.tex)
+% ===========================================================================
+\begin{tikzpicture}[
+    font=\scriptsize, >=Stealth, line width=0.5pt,
+    blk/.style={draw, rounded corners=1.5pt, fill=accent!10, align=center, minimum height=0.8cm},
+    mac/.style={draw, rounded corners=1.5pt, fill=orange!25, align=center},
+    preg/.style={draw, fill=gray!30, minimum width=0.32cm, minimum height=6.2cm},
+    unit/.style={draw, dashed, rounded corners=1.5pt, fill=green!8, align=center},
+    lab/.style={font=\bfseries\footnotesize, text=accent},
+  ]
+  % ---------------- pipeline registers ----------------
+  \node[preg] (r1) at (2.55,0) {};
+  \node[preg] (r2) at (6.25,0) {};
+  \node[preg] (r3) at (10.35,0) {};
+  \node[preg] (r4) at (13.25,0) {};
+  \node[font=\tiny, above=1pt of r1] {IF/ID};
+  \node[font=\tiny, above=1pt of r2] {ID/EX};
+  \node[font=\tiny, above=1pt of r3] {EX/MEM};
+  \node[font=\tiny, above=1pt of r4] {MEM/WB};
+
+  % ---------------- stage labels ----------------
+  \node[lab] at (1.1,4.05)  {IF};
+  \node[lab] at (4.4,4.05)  {ID};
+  \node[lab] at (8.3,4.05)  {EX};
+  \node[lab] at (11.8,4.05) {MEM};
+  \node[lab] at (14.2,4.05) {WB};
+
+  % ---------------- IF ----------------
+  \node[blk, minimum width=0.8cm] (pc) at (0.35,1.6) {PC};
+  \node[blk, minimum width=1.3cm, minimum height=1.4cm] (imem) at (1.45,0.2) {Instr.\\memory};
+  \node[blk, minimum width=0.7cm, minimum height=0.5cm] (add4) at (1.45,1.75) {+4};
+  \draw[->] (pc.south) |- (imem.west);
+  \draw[->] (pc.east) -- (add4.west);
+  \draw[->] (imem.east) -- (imem.east -| r1.west);
+
+  % ---------------- ID ----------------
+  \node[blk, minimum width=1.4cm] (dec) at (3.6,1.9) {Decoder\\+ imm gen};
+  \node[blk, minimum width=1.4cm, minimum height=1.6cm] (rf) at (3.6,-0.2) {Register\\file\\$32\times32$};
+  \node[unit, minimum width=1.5cm] (haz) at (4.55,-2.35) {Hazard unit\\load/MAC-use\\stall};
+  \draw[->] (r1.east |- dec.west) -- (dec.west);
+  \draw[->] (r1.east |- rf.west) -- (rf.west);
+  \draw[->] (dec.east) -- (dec.east -| r2.west);
+  \draw[->] (rf.east) -- (rf.east -| r2.west);
+
+  % ---------------- EX ----------------
+  \node[blk, minimum width=0.55cm, minimum height=1.3cm] (fmux) at (7.0,0.6) {fwd\\mux};
+  \node[blk, minimum width=1.6cm, minimum height=1.3cm] (alu) at (8.45,0.9) {ALU\\+ RV32M\\multiplier};
+  \node[blk, minimum width=1.4cm] (br) at (8.45,2.55) {Branch\\compare};
+  \node[mac, minimum width=1.6cm, minimum height=1.05cm] (mac1) at (8.45,-1.0) {MAC stage 1\\Booth $34\times34$};
+  \node[unit, minimum width=1.5cm] (fwd) at (7.6,-2.6) {Forwarding\\unit};
+  \draw[->] (r2.east |- fmux.west) -- (fmux.west);
+  \draw[->] (fmux.east |- alu.west) -- (alu.west);
+  \draw[->] (fmux.north) |- (br.west);
+  \draw[->] (fmux.south) |- (mac1.west);
+  \draw[->] (alu.east) -- (alu.east -| r3.west);
+  \draw[->] (mac1.east) -- node[above, font=\tiny]{s1\_prod} (mac1.east -| r3.west);
+  \draw[->, red!70!black] (br.north) -- ++(0,0.55) -| node[pos=0.25, above, font=\tiny]{taken: PC $\leftarrow$ target, flush IF/ID + ID/EX} (pc.north);
+
+  % ---------------- MEM ----------------
+  \node[blk, minimum width=1.5cm, minimum height=1.4cm] (dmem) at (11.8,0.9) {Data\\memory\\(byte/half/word)};
+  \node[mac, minimum width=1.5cm, minimum height=1.05cm] (mac2) at (11.8,-1.0) {MAC stage 2\\ACC$_{64}$ + sat};
+  \draw[->] (r3.east |- dmem.west) -- (dmem.west);
+  \draw[->] (r3.east |- mac2.west) -- (mac2.west);
+  \draw[->] (dmem.east) -- (dmem.east -| r4.west);
+  \draw[->] (mac2.east) -- node[above, font=\tiny]{rd\_data} (mac2.east -| r4.west);
+
+  % ---------------- WB ----------------
+  \node[blk, minimum width=0.6cm, minimum height=1.6cm] (wbmux) at (14.2,0.0) {WB\\mux};
+  \draw[->] (r4.east |- wbmux.west) -- (wbmux.west);
+  % write-back to register file
+  \draw[->, accent] (wbmux.south) -- ++(0,-2.95) -| node[pos=0.2, below, font=\tiny]{write-back (rd, value) \quad and WB $\rightarrow$ EX forwarding} (rf.south);
+
+  % forwarding paths (dashed)
+  \draw[->, dashed, green!45!black] (r3.south) ++(0,0.2) |- ($(fwd.east)+(0,0.12)$) node[pos=0.75, above, font=\tiny]{EX/MEM};
+  \draw[->, dashed, green!45!black] (fwd.north) -- (fwd.north |- fmux.south);
+  \draw[->, dashed, green!45!black] (haz.north) -- ++(0,0.5) -| node[pos=0.3, left, font=\tiny]{stall} (r1.south);
+
+  % MAC span box
+  \draw[orange!80!black, rounded corners, densely dotted, line width=0.8pt]
+      ($(mac1.south west)+(-0.15,-0.15)$) rectangle ($(mac2.north east)+(0.15,0.15)$);
+  \node[font=\tiny, text=orange!60!black, anchor=north west] at ($(mac1.south west)+(-0.1,-0.22)$)
+      {mac\_unit: its two internal registers coincide with EX/MEM and MEM/WB};
+\end{tikzpicture}

@@ -1,0 +1,95 @@
+%===========================================================================
+\chapter{Discussion}\label{ch:disc}
+%===========================================================================
+
+\section{Design trade-offs}
+\textbf{Dedicated accumulator vs.\ register-file accumulation.} A
+dedicated 64-bit accumulator gives full precision and needs only two
+register-file read ports. The cost is extra architectural state, which
+an operating system must save on a context switch, and explicit
+\code{rdacc} instructions to read the result. The Xpulp
+\code{p.mac}~\cite{cv32e40p} approach needs a third read port and
+accumulates in only 32 bits.
+
+\textbf{Saturation vs.\ wrap-around.} Signed operations saturate,
+which is the expected DSP behaviour, whereas \code{macu} wraps modulo $2^{64}$,
+which is what checksums and hashing need.
+
+\textbf{Two-stage MAC pipeline aligned with the CPU pipeline.} Putting
+the multiplication in EX and the accumulation in MEM means MAC
+instructions issue back-to-back with no forwarding inside the unit.
+Only a consumer placed \emph{directly} after a MAC result pays one
+stall cycle, exactly like a load, and in the scheduled FIR code this never
+happens.
+
+\textbf{Instruction count vs.\ loop overhead.} The MAC instructions
+cut the arithmetic work per tap from six instructions to one. In the
+looped FIR, however, loads and loop control remain, so the measured
+speed-up is 1.59$\times$. Once the loop overhead is removed by
+unrolling, the MAC unit's advantage grows to 2.67$\times$. Adding
+post-increment loads or hardware loops (as in Xpulp) would bring the
+looped code close to the unrolled performance.
+
+\section{Limitations}
+The synthesis results come from open-source tools and a generic gate library.
+No commercial ASIC standard-cell library was used, so the report gives gate
+counts and logic depth rather than area in $\mu$m$^2$ or power figures. The MAC
+unit's critical path is the 34$\times$34-bit combinational Booth multiplier
+(17.7\,ns on ECP5, 127 gate levels), whose partial products are summed with
+ripple-carry adders. The processor implements the RV32M multiply instructions
+in a single cycle, which is simple but sets the processor's critical path
+(28.9\,ns, 34.6\,MHz on ECP5). It has no caches, interrupts, CSRs or division
+instructions, and its memories are modelled with combinational reads; on an
+FPGA they would be replaced by synchronous block RAM, which requires an extra
+fetch stage or registered addresses. Finally, the programs are written in
+assembly with a project-specific assembler, and C code would need compiler
+support for the custom instructions, for example through inline assembly.
+
+\section{Future work}
+Several extensions would build on this work. The critical paths could be
+shortened by using a carry-save (Wallace/Dadda) tree with a parallel-prefix
+final adder (for example Kogge-Stone) for the Booth multiplier, and by
+pipelining the RV32M multiplier over EX and MEM, as is already done for the MAC
+unit. Post-increment loads and a zero-overhead hardware loop could be added so
+that looped DSP code reaches the throughput of the unrolled code, and
+packed-SIMD operations (for example two 16$\times$16 MACs per cycle), similar
+to the RISC-V P-extension proposals, would widen the arithmetic. The
+instruction and data memories could be mapped to FPGA block RAM so that the
+processor runs on a real ECP5 board, and the design could be taken through an
+ASIC flow with a real standard-cell library (for example OpenLane with the
+SkyWater 130\,nm PDK). Finally, the Booth multiplier could be formally verified
+against \code{*}, for example with SymbiYosys.
+
+%===========================================================================
+\chapter{Conclusion}\label{ch:concl}
+%===========================================================================
+This project designed a RISC-V custom-extension multiply-accumulate unit for
+digital signal processing, integrated it into a complete 5-stage pipelined
+RISC-V processor, and verified both thoroughly. The MAC unit adds eight
+\code{custom-0} instructions and is built around a radix-4 Booth multiplier
+and a 64-bit saturating accumulator with Q15 support. Its two-stage pipeline
+accepts one instruction per cycle and lines up exactly with the EX and MEM
+stages of the processor.
+
+At the unit level, an independent reference model and scoreboard, exhaustive
+multiplier tests, directed corner cases, three analytical DSP benchmarks and a
+3{,}000-instruction constrained-random regression performed 88{,}896 checks,
+all with zero errors.
+
+At the system level, real RISC-V programs, built with a project-specific
+assembler, ran on the processor: an 18-part ISA and hazard self-test, and a
+16-tap low-pass FIR over 128 samples in four versions. Every program passed.
+The FIR outputs were bit-identical to the golden model, the unwanted tone was
+attenuated by 60.1\,dB as the filter design predicts, and mutation tests
+confirmed that the system tests detect forwarding and stall bugs. Compared with
+the same filter in plain RV32IM software, the MAC instructions made the FIR
+1.59$\times$ faster in looped form and 2.67$\times$ faster in unrolled form,
+with 2.6$\times$ smaller code.
+
+Yosys synthesis produced a latch-free MAC netlist of 9{,}532 gates and 179
+flip-flops, which passes the full testbench at gate level. On a Lattice ECP5
+FPGA, the MAC unit reaches 56.4\,MHz, and the complete processor with the
+MAC unit reaches 34.6\,MHz using 9\,\% of the device's logic. The schematics,
+floorplans and timing analysis show that the multipliers, both the Booth
+multiplier and the RV32M multiplier, are the largest blocks and set the
+critical paths. That makes them the main target for future optimisation.

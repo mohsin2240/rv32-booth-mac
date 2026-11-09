@@ -1,0 +1,207 @@
+%===========================================================================
+\chapter{RISC-V Pipelined Processor Integration}\label{ch:cpu}
+%===========================================================================
+
+A MAC unit is only useful inside a processor that fetches, decodes and
+issues its instructions. To show this, the MAC unit was built into a complete
+\textbf{5-stage pipelined RISC-V processor} (\code{rtl/rv32\_core.v}, 638
+lines) that implements RV32I, the multiply subset of RV32M, and the eight MAC
+instructions of Chapter~\ref{ch:spec}. The processor runs real RISC-V machine
+code produced by a purpose-written assembler. Its results are checked
+bit-exactly in simulation (Chapter~\ref{ch:sysres}) and it was synthesised and
+placed-and-routed on an FPGA (Chapter~\ref{ch:synth}).
+
+\section{Pipeline organisation}
+Figure~\ref{fig:cpu} shows the datapath. It is the classic five-stage RISC
+pipeline (IF, ID, EX, MEM, WB) described by Patterson and
+Hennessy~\cite{patterson}, extended with the MAC unit.
+
+\begin{figure}[H]
+  \centering
+  \resizebox{\linewidth}{!}{\input{fig_pipeline.tex}}
+  \caption{5-stage RV32IM pipeline with the integrated MAC unit. Grey bars are
+    pipeline registers; dashed green blocks are the hazard and forwarding
+    units; the MAC unit (orange) spans EX and MEM.}
+  \label{fig:cpu}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{Work done in each pipeline stage.}
+  \label{tab:stages}
+  \small
+  \begin{tabularx}{\linewidth}{@{}lXX@{}}
+    \toprule
+    Stage & Ordinary instructions & MAC instructions \\
+    \midrule
+    IF  & PC register addresses the instruction memory; next PC = PC+4 or branch target & same \\
+    ID  & decode, immediate generation, register-file read (with write-first bypass), hazard check & same; only \code{mac/msu/mul.acc/macu} read \code{rs1}/\code{rs2} \\
+    EX  & forwarding muxes, ALU, RV32M multiplier, branch/jump resolution & forwarded operands enter \textbf{MAC stage 1}: decode + Booth multiply \\
+    MEM & load/store access with byte/half/word alignment & \textbf{MAC stage 2}: accumulate, saturate, read-out \\
+    WB  & write ALU result or load data to \code{rd} & write the MAC result to \code{rd} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\paragraph{Why the MAC unit fits without stalls.}
+The MAC unit has two internal pipeline registers (Chapter~\ref{ch:impl}). In
+the processor they line up exactly with the EX/MEM and MEM/WB registers: a MAC
+instruction is in MAC stage~1 while it is in EX, in MAC stage~2 while it is in
+MEM, and its \code{rd\_data\_o} is valid when it reaches WB. The MAC unit
+never stalls, and the core never stalls EX, MEM or WB, so the two pipelines
+always move together. The testbench checks this alignment on every MAC
+write-back.
+
+\section{Hazard handling}
+\paragraph{Data hazards: forwarding.}
+An instruction in EX can read a value that has been computed but not yet
+written to the register file. The forwarding unit selects each EX operand
+from three sources, in priority order:
+\begin{equation}
+  \text{op}_A =
+  \begin{cases}
+    \text{EX/MEM.result} & \text{if EX/MEM writes } rd = rs_1 \ne 0 \text{ and is not a load or MAC},\\
+    \text{WB value}      & \text{else if MEM/WB writes } rd = rs_1 \ne 0,\\
+    \text{ID/EX.rs1\_val} & \text{otherwise,}
+  \end{cases}
+\end{equation}
+and the same for $\text{op}_B$. The register file is also bypassed in ID, so
+an instruction three positions behind a writer always reads the new value.
+
+\paragraph{Load-use and MAC-use stalls.}
+A load result is ready only at the end of MEM, and so is a MAC result, because
+it leaves MAC stage~2 at the MEM/WB boundary. An instruction that uses such a
+result immediately afterwards must therefore wait one cycle. The hazard unit
+detects
+\begin{equation}
+\begin{split}
+  \text{stall} = {} & \text{IF/ID.valid} \wedge \text{ID/EX.valid} \wedge
+                      (\text{ID/EX.load} \vee \text{ID/EX.mac}) \\
+                    & \wedge \big(rd_{EX}=rs_{1,ID} \vee rd_{EX}=rs_{2,ID}\big) \wedge rd_{EX}\ne 0,
+\end{split}
+\end{equation}
+freezes PC and IF/ID, and inserts a bubble into ID/EX. One cycle later, the
+value is forwarded from WB. Section~\ref{sec:pipeviz} shows this happening in
+the simulation.
+
+\paragraph{Control hazards.}
+Branches and jumps are resolved in EX. A taken branch loads the target into
+the PC and turns the two younger instructions (in IF and ID) into bubbles, so
+it costs two cycles. ECALL/EBREAK stops instruction fetch; when it reaches WB,
+the core halts (\code{halted\_o}). An illegal instruction halts the core with
+\code{error\_o}.
+
+\section{Instruction set and system}
+\begin{table}[H]
+  \centering
+  \caption{Instructions implemented by \code{rv32\_core}.}
+  \label{tab:cpuisa}
+  \small
+  \begin{tabularx}{\linewidth}{@{}lX@{}}
+    \toprule
+    Group & Instructions \\
+    \midrule
+    RV32I arithmetic/logic & \code{ADD SUB SLL SLT SLTU XOR SRL SRA OR AND} and immediate forms \code{ADDI SLTI SLTIU XORI ORI ANDI SLLI SRLI SRAI}, \code{LUI AUIPC} \\
+    RV32I control & \code{JAL JALR BEQ BNE BLT BGE BLTU BGEU} \\
+    RV32I memory & \code{LB LH LW LBU LHU SB SH SW}, \code{FENCE} (no-op) \\
+    RV32I system & \code{ECALL EBREAK} (halt) \\
+    RV32M (multiply subset) & \code{MUL MULH MULHSU MULHU}, using one shared 33$\times$33 signed multiplier \\
+    Xmac (custom-0) & \code{mac msu mul.acc macu rdacc.lo rdacc.hi rdacc.q15 clracc} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\noindent Division (\code{DIV}/\code{REM}) and CSR instructions are not
+implemented, since none of the DSP programs need them. \code{riscv\_soc.v}
+connects the core to a 4\,KiB instruction memory at address
+\code{0x0000\_0000} and a 16\,KiB byte-enabled data memory at
+\code{0x0001\_0000}. Both are initialised by the testbench with
+\code{\$readmemh}.
+
+\section{Software toolchain}
+There is no RISC-V GCC toolchain on the development machine, and a standard
+toolchain would not know the custom instructions anyway. So a small two-pass
+assembler, \code{sw/rvasm.py} (386 lines of Python), was written for this
+project. It supports all instructions in Table~\ref{tab:cpuisa}, the common
+pseudo-instructions (\code{li la mv j call ret beqz bnez}, \ldots), labels,
+\code{.equ}/\code{.include} and data directives. Its output encodings were
+checked against reference encodings from the RISC-V specification (for
+example \code{lw x5,8(x2)} $\rightarrow$ \code{0x00812283} and
+\code{bne x1,x2,-8} $\rightarrow$ \code{0xfe209ce3}).
+\code{sw/build.py} designs the test filter, computes the golden results and
+assembles all the programs (Table~\ref{tab:progs}).
+
+\begin{table}[H]
+  \centering
+  \caption{Programs executed on the processor.}
+  \label{tab:progs}
+  \small
+  \begin{tabularx}{\linewidth}{@{}lrX@{}}
+    \toprule
+    Program & Static instr. & Purpose \\
+    \midrule
+    \code{isa\_test} & 282 & 18 self-checking tests: every instruction class, sign/zero extension, all branch types, call/return, RV32M, every MAC instruction, forwarding, load-use and MAC-use hazards, \code{x0} \\
+    \code{fir\_mac\_loop} & 27 & 16-tap Q15 FIR over 128 samples using \code{mac} and \code{rdacc.q15} \\
+    \code{fir\_rv32im\_loop} & 51 & the same filter in plain RV32IM (\code{mul}/\code{mulh} + 64-bit add with carry + software saturation) \\
+    \code{fir\_mac\_unrolled} & 64 & MAC version with the tap loop fully unrolled \\
+    \code{fir\_rv32im\_unrolled} & 166 & RV32IM version with the tap loop fully unrolled \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Listing~\ref{lst:firloops} compares the two inner loops. Per tap, the MAC
+version needs 7 instructions where RV32IM needs 12, because one \code{mac}
+replaces the six-instruction 64-bit multiply-accumulate sequence. After the
+loop, the MAC version converts and saturates the result with a single
+\code{rdacc.q15}, where RV32IM needs a 14-instruction shift-and-saturate
+routine. Both loops are scheduled so that no load-use stall occurs.
+
+\begin{figure}[H]
+\begin{minipage}[t]{0.40\linewidth}
+\begin{lstlisting}[language={}, basicstyle=\ttfamily\scriptsize, numbers=none, title={\code{fir\_mac\_loop} (7 instr./tap)}]
+inner:
+  lh   t3, 0(t0)    # x
+  lh   t4, 0(t1)    # h
+  addi t0, t0, 2
+  addi t1, t1, 2
+  addi t2, t2, -1
+  mac  x0, t3, t4   # ACC += x*h
+  bnez t2, inner
+  rdacc.q15 t5      # Q30->Q15, sat
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.56\linewidth}
+\begin{lstlisting}[language={}, basicstyle=\ttfamily\scriptsize, numbers=none, title={\code{fir\_rv32im\_loop} (12 instr./tap)}]
+inner:
+  lh   t3, 0(t0)
+  lh   t4, 0(t1)
+  addi t0, t0, 2
+  addi t1, t1, 2
+  mul  a2, t3, t4    # product low
+  mulh a3, t3, t4    # product high
+  addi t2, t2, -1
+  add  s4, s4, a2    # 64-bit add
+  sltu a4, s4, a2    #   carry
+  add  s5, s5, a3
+  add  s5, s5, a4
+  bnez t2, inner
+  ... 14 instr.: acc>>>15 + saturate
+\end{lstlisting}
+\end{minipage}
+\captionof{lstlisting}{FIR inner loops with and without the MAC unit.}
+\label{lst:firloops}
+\end{figure}
+
+\section{DSP test case: low-pass FIR filter}
+The benchmark is a realistic filtering task. A 16-tap low-pass filter
+(windowed sinc, Hamming window, cut-off 0.1 cycles/sample, unity DC gain) is
+quantised to Q15:
+\[
+h = \{-114, -159, -139, 291, 1450, 3284, 5246, 6524, 6524, 5246, 3284, 1450, 291, -139, -159, -114\}.
+\]
+The input contains 128 Q15 samples of a wanted low-frequency tone
+($0.5\sin(2\pi\,0.015\,n)$) plus an unwanted high-frequency tone
+($0.3\sin(2\pi\,0.3\,n)$). \code{build.py} computes the bit-exact expected output
+$y[n]=\mathrm{sat}_{16}\big((\sum_k h[k]x[n-k]) \ggg 15\big)$ in Python
+(independently of the hardware) and writes it to \code{build/fir\_golden.hex}
+for the testbench.
