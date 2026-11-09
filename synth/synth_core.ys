@@ -1,0 +1,20 @@
+# ===========================================================================
+# synth_core.ys - synthesis of the complete processor (rv32_core with the
+# integrated MAC unit). Memories are outside the core (ports), as in a real
+# SoC where they map to SRAM / FPGA block RAM.
+#   Run from the project root:   yosys -s synth/synth_core.ys
+# ===========================================================================
+
+# ---------------- generic gates, hierarchical breakdown ----------------
+read_verilog rtl/booth_multiplier.v rtl/mac_unit.v rtl/rv32_core.v
+synth -top rv32_core
+abc -g AND,NAND,OR,NOR,XOR,XNOR,ANDNOT,ORNOT,MUX
+opt_clean -purge
+check -assert
+tee -o synth/reports/core_generic_hier_stat.txt stat
+
+# ---------------- Lattice ECP5 ----------------
+design -reset
+read_verilog rtl/booth_multiplier.v rtl/mac_unit.v rtl/rv32_core.v
+synth_ecp5 -top rv32_core -json synth/out/rv32_core_ecp5.json
+tee -o synth/reports/core_ecp5_stat.txt stat

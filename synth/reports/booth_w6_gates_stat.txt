@@ -1,0 +1,24 @@
+
+21. Printing statistics.
+
+=== booth_multiplier ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      207 wires
+      228 wire bits
+        3 public wires
+       24 public wire bits
+        3 ports
+       24 port bits
+      216 cells
+       10   $_ANDNOT_
+       50   $_AND_
+        4   $_MUX_
+      110   $_NAND_
+        5   $_NOR_
+        2   $_ORNOT_
+        5   $_OR_
+        8   $_XNOR_
+       22   $_XOR_
+

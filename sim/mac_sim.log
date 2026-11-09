@@ -1,0 +1,161 @@
+VCD info: dumpfile mac_unit.vcd opened for output.
+====================================================================
+ RISC-V MAC Unit (custom-0) -- Self-Checking Testbench
+====================================================================
+
+--- T1: Reset state ---
+  [PASS]           rdacc.lo x5          (after reset) | rd=0x00000000 (0)  acc=0x0000000000000000 ovf=0            
+  [PASS]           rdacc.hi x5          (after reset) | rd=0x00000000 (0)  acc=0x0000000000000000 ovf=0            
+
+--- T2: Basic MUL / MAC / MSU (back-to-back issue) ---
+  [PASS]                   mul.acc x5, 7, 6     -> 42 | rd=0x0000002a (42)  acc=0x000000000000002a ovf=0            
+  [PASS]                   mac x5, 3, -4        -> 30 | rd=0x0000001e (30)  acc=0x000000000000001e ovf=0            
+  [PASS]                   msu x5, -5, 10       -> 80 | rd=0x00000050 (80)  acc=0x0000000000000050 ovf=0            
+  [PASS]               mac x5, 100, 1000    -> 100080 | rd=0x000186f0 (100080)  acc=0x00000000000186f0 ovf=0            
+  [PASS]               rdacc.lo x6          -> 100080 | rd=0x000186f0 (100080)  acc=0x00000000000186f0 ovf=0            
+  [PASS]                    rdacc.hi x7          -> 0 | rd=0x00000000 (0)  acc=0x00000000000186f0 ovf=0            
+
+--- T3: Sign combinations ---
+  [PASS]                  mul.acc  (+12)*(+13) -> 156 | rd=0x0000009c (156)  acc=0x000000000000009c ovf=0            
+  [PASS]                 mul.acc  (+12)*(-13) -> -156 | rd=0xffffff64 (-156)  acc=0xffffffffffffff64 ovf=0            
+  [PASS]                   rdacc.hi (sign ext.) -> -1 | rd=0xffffffff (-1)  acc=0xffffffffffffff64 ovf=0            
+  [PASS]                 mul.acc  (-12)*(+13) -> -156 | rd=0xffffff64 (-156)  acc=0xffffffffffffff64 ovf=0            
+  [PASS]                  mul.acc  (-12)*(-13) -> 156 | rd=0x0000009c (156)  acc=0x000000000000009c ovf=0            
+
+--- T4: Extreme operands, full 64-bit product ---
+  [PASS]         mul.acc MAX*MAX = 0x3FFFFFFF00000001 | rd=0x00000001 (1)  acc=0x3fffffff00000001 ovf=0            
+  [PASS]                rdacc.hi        -> 0x3FFFFFFF | rd=0x3fffffff (1073741823)  acc=0x3fffffff00000001 ovf=0            
+  [PASS]                       mul.acc MIN*MIN = 2^62 | rd=0x00000000 (0)  acc=0x4000000000000000 ovf=0            
+  [PASS]                rdacc.hi        -> 0x40000000 | rd=0x40000000 (1073741824)  acc=0x4000000000000000 ovf=0            
+  [PASS]         mul.acc MIN*MAX = 0xC000000080000000 | rd=0x80000000 (-2147483648)  acc=0xc000000080000000 ovf=0            
+  [PASS]                rdacc.hi        -> 0xC0000000 | rd=0xc0000000 (-1073741824)  acc=0xc000000080000000 ovf=0            
+  [PASS]                     mul.acc (-1)*MIN = +2^31 | rd=0x80000000 (-2147483648)  acc=0x0000000080000000 ovf=0            
+  [PASS]                         rdacc.hi        -> 0 | rd=0x00000000 (0)  acc=0x0000000080000000 ovf=0            
+
+--- T5: 64-bit accumulator saturation and sticky OVF ---
+  [PASS]              mul.acc MIN*MIN        acc=2^62 | rd=0x00000000 (0)  acc=0x4000000000000000 ovf=0            
+  [PASS]           mac +2^62 -> 2^63 SAT to INT64_MAX | rd=0xffffffff (-1)  acc=0x7fffffffffffffff ovf=1            
+  [PASS]           mac  (stays saturated, OVF sticky) | rd=0xffffffff (-1)  acc=0x7fffffffffffffff ovf=1            
+  [PASS]         rdacc.hi               -> 0x7FFFFFFF | rd=0x7fffffff (2147483647)  acc=0x7fffffffffffffff ovf=1            
+  [PASS]                  clracc (clears ACC and OVF) | rd=0x00000000 (0)  acc=0x0000000000000000 ovf=0  (no write)
+  [PASS]             mul.acc MIN*MAX        acc~-2^62 | rd=0x80000000 (-2147483648)  acc=0xc000000080000000 ovf=0            
+  [PASS]              msu  -2^62             (no ovf) | rd=0x80000000 (-2147483648)  acc=0x8000000080000000 ovf=0            
+  [PASS]        mac  -> below -2^63, SAT to INT64_MIN | rd=0x00000000 (0)  acc=0x8000000000000000 ovf=1            
+  [PASS]         rdacc.hi               -> 0x80000000 | rd=0x80000000 (-2147483648)  acc=0x8000000000000000 ovf=1            
+  [PASS]          mul.acc (restarts, clears OVF) -> 6 | rd=0x00000006 (6)  acc=0x0000000000000006 ovf=0            
+
+--- T6: Unsigned MACU (modulo 2^64) ---
+  [PASS]                                       clracc | rd=0x00000000 (0)  acc=0x0000000000000000 ovf=0  (no write)
+  [PASS]       macu 0xFFFFFFFF^2 = 0xFFFFFFFE00000001 | rd=0x00000001 (1)  acc=0xfffffffe00000001 ovf=0            
+  [PASS]                rdacc.hi        -> 0xFFFFFFFE | rd=0xfffffffe (-2)  acc=0xfffffffe00000001 ovf=0            
+  [PASS]                   macu again (wraps, no OVF) | rd=0x00000002 (2)  acc=0xfffffffc00000002 ovf=0            
+  [PASS]                rdacc.hi        -> 0xFFFFFFFC | rd=0xfffffffc (-4)  acc=0xfffffffc00000002 ovf=0            
+  [PASS]                  rdacc.lo  sum_{i=1..10} i^2 | rd=0x00000181 (385)  acc=0x0000000000000181 ovf=0            
+  [PASS]          sum of squares 1..10 (analytic 385) | got 385, expected 385
+
+--- T7: Destination x0 (no register write) ---
+  [PASS]         mul.acc x0, 9, 9  (acc=81, no write) | rd=0x00000051 (81)  acc=0x0000000000000051 ovf=0  (no write)
+  [PASS]        mac     x0, 1, 19 (acc=100, no write) | rd=0x00000064 (100)  acc=0x0000000000000064 ovf=0  (no write)
+  [PASS]                     rdacc.lo x31      -> 100 | rd=0x00000064 (100)  acc=0x0000000000000064 ovf=0            
+
+--- T8: Illegal instruction detection ---
+  [PASS]        RV32M MUL (opcode OP) -> illegal here | rd=0x00000000 (0)  acc=0x0000000000000064 ovf=0     ILLEGAL
+  [PASS]      custom-0 with funct7=0100000 -> illegal | rd=0x00000000 (0)  acc=0x0000000000000064 ovf=0     ILLEGAL
+  [PASS]           NOP (addi x0,x0,0) -> illegal here | rd=0x00000000 (0)  acc=0x0000000000000064 ovf=0     ILLEGAL
+  [PASS]             rdacc.lo  (ACC unchanged) -> 100 | rd=0x00000064 (100)  acc=0x0000000000000064 ovf=0            
+
+--- T9: Q15 fixed-point read-out (rdacc.q15) ---
+  [PASS]                    mul.acc 0.5 * 0.5   (Q15) | rd=0x10000000 (268435456)  acc=0x0000000010000000 ovf=0  (no write)
+  [PASS]                    rdacc.q15 -> 0.25  = 8192 | rd=0x00002000 (8192)  acc=0x0000000010000000 ovf=0            
+  [PASS]                    mul.acc -0.5 * 0.5  (Q15) | rd=0xf0000000 (-268435456)  acc=0xfffffffff0000000 ovf=0  (no write)
+  [PASS]                   rdacc.q15 -> -0.25 = -8192 | rd=0xffffe000 (-8192)  acc=0xfffffffff0000000 ovf=0            
+  [PASS]                    mul.acc -1.0 * -1.0 (Q15) | rd=0x40000000 (1073741824)  acc=0x0000000040000000 ovf=0  (no write)
+  [PASS]               rdacc.q15 -> +1.0 SAT to 32767 | rd=0x00007fff (32767)  acc=0x0000000040000000 ovf=0            
+  [PASS]                                   mac ~ +1.0 | rd=0x7fff0001 (2147418113)  acc=0x000000007fff0001 ovf=0  (no write)
+  [PASS]                                   mac ~ +1.0 | rd=0xbffe0002 (-1073872894)  acc=0x00000000bffe0002 ovf=0  (no write)
+  [PASS]               rdacc.q15 -> ~3.0 SAT to 32767 | rd=0x00007fff (32767)  acc=0x00000000bffe0002 ovf=0            
+  [PASS]                       mul.acc -1.0 * 0.99997 | rd=0xc0008000 (-1073709056)  acc=0xffffffffc0008000 ovf=0  (no write)
+  [PASS]                               mac  -> ~ -2.0 | rd=0x80010000 (-2147418112)  acc=0xffffffff80010000 ovf=0  (no write)
+  [PASS]                   rdacc.q15 -> SAT to -32768 | rd=0xffff8000 (-32768)  acc=0xffffffff80010000 ovf=0            
+
+--- T10: DSP benchmark - dot product [1..8].[8..1] ---
+  [PASS]                 rdacc.lo  dot product result | rd=0x00000078 (120)  acc=0x0000000000000078 ovf=0            
+  [PASS]                   dot product (analytic 120) | got 120, expected 120
+  Throughput: 9 instructions issued in 9 cycles (1 instr/cycle)
+
+--- T11: DSP benchmark - 8-tap moving-average FIR, step input ---
+  h[k] = 4096 (0.125 in Q15), x[n] = 16384 (0.5) for n >= 0
+  Analytic: y[n] = 2048*(n+1) for n < 8, then 16384
+    n | x[n]   | y[n] DUT | y[n] analytic
+    0 |  16384 |     2048 |     2048 PASS
+  [PASS]                      FIR moving average y[n] | got 2048, expected 2048
+    1 |  16384 |     4096 |     4096 PASS
+  [PASS]                      FIR moving average y[n] | got 4096, expected 4096
+    2 |  16384 |     6144 |     6144 PASS
+  [PASS]                      FIR moving average y[n] | got 6144, expected 6144
+    3 |  16384 |     8192 |     8192 PASS
+  [PASS]                      FIR moving average y[n] | got 8192, expected 8192
+    4 |  16384 |    10240 |    10240 PASS
+  [PASS]                      FIR moving average y[n] | got 10240, expected 10240
+    5 |  16384 |    12288 |    12288 PASS
+  [PASS]                      FIR moving average y[n] | got 12288, expected 12288
+    6 |  16384 |    14336 |    14336 PASS
+  [PASS]                      FIR moving average y[n] | got 14336, expected 14336
+    7 |  16384 |    16384 |    16384 PASS
+  [PASS]                      FIR moving average y[n] | got 16384, expected 16384
+    8 |  16384 |    16384 |    16384 PASS
+  [PASS]                      FIR moving average y[n] | got 16384, expected 16384
+    9 |  16384 |    16384 |    16384 PASS
+  [PASS]                      FIR moving average y[n] | got 16384, expected 16384
+   10 |  16384 |    16384 |    16384 PASS
+  [PASS]                      FIR moving average y[n] | got 16384, expected 16384
+   11 |  16384 |    16384 |    16384 PASS
+  [PASS]                      FIR moving average y[n] | got 16384, expected 16384
+  FIR cost: 9 instructions/sample, 111 cycles for 12 samples (incl. drain)
+
+--- T12: DSP benchmark - 8-tap triangular low-pass FIR ---
+  h = {1024,3072,5120,7168,7168,5120,3072,1024}  (sum = 1.0 in Q15)
+  x[n] = 8000 + 6000*(-1)^n   (DC + Nyquist-frequency tone)
+  Analytic: H(Nyquist) = sum h[k](-1)^k = 0, H(DC) = 1
+            => y[n] = 8000 exactly once the 8-tap window is full
+    n | x[n]   | y[n] DUT
+    0 |  14000 |      437      (warm-up)
+    1 |   2000 |     1375      (warm-up)
+    2 |  14000 |     2812      (warm-up)
+    3 |   2000 |     4750      (warm-up)
+    4 |  14000 |     6312      (warm-up)
+    5 |   2000 |     7375      (warm-up)
+    6 |  14000 |     7937      (warm-up)
+    7 |   2000 |     8000 (steady state)
+    8 |  14000 |     8000 (steady state)
+    9 |   2000 |     8000 (steady state)
+   10 |  14000 |     8000 (steady state)
+   11 |   2000 |     8000 (steady state)
+   12 |  14000 |     8000 (steady state)
+   13 |   2000 |     8000 (steady state)
+   14 |  14000 |     8000 (steady state)
+   15 |   2000 |     8000 (steady state)
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+  [PASS]               LPF steady-state output = 8000 | got 8000, expected 8000
+
+--- T13: Constrained-random regression (3000 instructions) ---
+  random regression complete
+
+====================================================================
+ FUNCTIONAL COVERAGE
+   mac=570 msu=338 mul.acc=378 macu=381 rdacc.lo=346 rdacc.hi=386 rdacc.q15=393 clracc=374
+   illegal=162  saturation events=7  rd=x0 writes=360  bubble gaps=684
+ RESULTS
+   instructions issued : 3328
+   checks performed    : 3351
+   errors              : 0
+   >>> ALL TESTS PASSED <<<
+====================================================================
+..\tb\tb_mac_unit.v:648: $finish called at 47070000 (1ps)

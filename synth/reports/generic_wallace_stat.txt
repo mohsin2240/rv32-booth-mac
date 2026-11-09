@@ -1,0 +1,27 @@
+
+22. Printing statistics.
+
+=== mac_unit ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     7031 wires
+     8085 wire bits
+       25 public wires
+      540 public wire bits
+       14 ports
+      205 port bits
+     7541 cells
+      107   $_ANDNOT_
+     1352   $_AND_
+       73   $_MUX_
+     3152   $_NAND_
+      164   $_NOR_
+       73   $_NOT_
+      109   $_ORNOT_
+      425   $_OR_
+       65   $_SDFFE_PN0P_
+      114   $_SDFF_PN0_
+      657   $_XNOR_
+     1250   $_XOR_
+

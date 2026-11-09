@@ -1,0 +1,28 @@
+14. Printing statistics.
+
+=== mac_unit ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     9042 wires
+    10096 wire bits
+       25 public wires
+      540 public wire bits
+       14 ports
+      205 port bits
+     9532 cells
+       96   $_ANDNOT_
+     1785   $_AND_
+       32   $_MUX_
+     5027   $_NAND_
+      226   $_NOR_
+       74   $_NOT_
+       79   $_ORNOT_
+      376   $_OR_
+       65   $_SDFFE_PN0P_
+      114   $_SDFF_PN0_
+      199   $_XNOR_
+     1459   $_XOR_
+
+   Estimated number of transistors:      55456+
+

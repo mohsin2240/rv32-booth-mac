@@ -1,0 +1,67 @@
+[
+  {
+    "name": "isa_test",
+    "status": "PASS",
+    "cycles": 348,
+    "instret": 300,
+    "stalls": 8,
+    "flushes": 18,
+    "macs": 22,
+    "a0": "600d",
+    "errors": 0,
+    "cpi": 1.16,
+    "n_instr_static": 282
+  },
+  {
+    "name": "fir_mac_loop",
+    "status": "PASS",
+    "cycles": 19724,
+    "instret": 15626,
+    "stalls": 0,
+    "flushes": 2047,
+    "macs": 2304,
+    "a0": "600d",
+    "errors": 0,
+    "cpi": 1.2622552156661975,
+    "n_instr_static": 27
+  },
+  {
+    "name": "fir_rv32im_loop",
+    "status": "PASS",
+    "cycles": 31363,
+    "instret": 26895,
+    "stalls": 0,
+    "flushes": 2232,
+    "macs": 0,
+    "a0": "600d",
+    "errors": 0,
+    "cpi": 1.1661275329986986,
+    "n_instr_static": 51
+  },
+  {
+    "name": "fir_mac_unrolled",
+    "status": "PASS",
+    "cycles": 7180,
+    "instret": 6922,
+    "stalls": 0,
+    "flushes": 127,
+    "macs": 2176,
+    "a0": "600d",
+    "errors": 0,
+    "cpi": 1.0372724646056053,
+    "n_instr_static": 64
+  },
+  {
+    "name": "fir_rv32im_unrolled",
+    "status": "PASS",
+    "cycles": 19203,
+    "instret": 18575,
+    "stalls": 0,
+    "flushes": 312,
+    "macs": 0,
+    "a0": "600d",
+    "errors": 0,
+    "cpi": 1.0338088829071332,
+    "n_instr_static": 166
+  }
+]

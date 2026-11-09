@@ -1,0 +1,21 @@
+
+4. Printing statistics.
+
+=== mac_unit ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     6633 wires
+    11615 wire bits
+     6633 public wires
+    11615 public wire bits
+       14 ports
+      205 port bits
+     7882 cells
+        1   $scopeinfo
+      155   CCU2C
+      584   L6MUX21
+     5108   LUT4
+     1855   PFUMX
+      179   TRELLIS_FF
+

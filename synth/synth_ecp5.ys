@@ -1,0 +1,33 @@
+# ===========================================================================
+# synth_ecp5.ys - FPGA synthesis for a Lattice ECP5 (LFE5U-85F)
+#   Run from the project root:   yosys -s synth/synth_ecp5.ys
+#
+#   Design A : mac_unit with the radix-4 Booth multiplier (as written)
+#   Design B : same mac_unit, Booth module swapped for a native '*'
+#              multiplier (synth/native_multiplier.v) so Yosys can map it
+#              to the ECP5 hard MULT18X18D DSP blocks - comparison only.
+#
+#   For each design:
+#     *_stat.txt   resource usage of mac_unit alone
+#     *.json       mac_unit inside fmax_wrapper.v (registered I/O), which is
+#                  placed and routed with nextpnr-ecp5 to obtain Fmax
+# ===========================================================================
+
+# ---------------- Design A: Booth multiplier in LUTs ----------------
+read_verilog rtl/booth_multiplier.v rtl/mac_unit.v
+synth_ecp5 -top mac_unit
+tee -o synth/reports/ecp5_booth_stat.txt stat
+
+design -reset
+read_verilog rtl/booth_multiplier.v rtl/mac_unit.v synth/fmax_wrapper.v
+synth_ecp5 -top mac_unit_fmax_wrapper -json synth/out/mac_unit_ecp5_booth.json
+
+# ---------------- Design B: native multiplier -> DSP blocks ---------
+design -reset
+read_verilog synth/native_multiplier.v rtl/mac_unit.v
+synth_ecp5 -top mac_unit
+tee -o synth/reports/ecp5_dsp_stat.txt stat
+
+design -reset
+read_verilog synth/native_multiplier.v rtl/mac_unit.v synth/fmax_wrapper.v
+synth_ecp5 -top mac_unit_fmax_wrapper -json synth/out/mac_unit_ecp5_dsp.json

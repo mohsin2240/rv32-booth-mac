@@ -1,0 +1,134 @@
+
+8. Printing statistics.
+
+=== rv32_core ===
+
+        +----------Local Count, excluding submodules.
+        | 
+    13227 wires
+    15754 wire bits
+      123 public wires
+     2054 public wire bits
+       17 ports
+      330 port bits
+    15303 cells
+      138   $_ANDNOT_
+     2604   $_AND_
+        4   $_DFFE_PN_
+     1024   $_DFFE_PP_
+       37   $_DFF_P_
+     2136   $_MUX_
+     4866   $_NAND_
+      129   $_NOR_
+       45   $_NOT_
+      448   $_ORNOT_
+      477   $_OR_
+       36   $_SDFFCE_PN0N_
+       64   $_SDFFCE_PP0N_
+       32   $_SDFFE_PN0N_
+      163   $_SDFFE_PN0P_
+        1   $_SDFFE_PP0N_
+       61   $_SDFFE_PP0P_
+        3   $_SDFFE_PP1P_
+      122   $_SDFF_PN0_
+       48   $_SDFF_PP0_
+        3   $_SDFF_PP1_
+      200   $_XNOR_
+     2662   $_XOR_
+        1 submodules
+        1   mac_unit
+
+=== mac_unit ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     1709 wires
+     2833 wire bits
+       27 public wires
+      612 public wire bits
+       14 ports
+      205 port bits
+     2138 cells
+       48   $_ANDNOT_
+      542   $_AND_
+       48   $_MUX_
+      539   $_NAND_
+      151   $_NOR_
+       72   $_NOT_
+       67   $_ORNOT_
+      276   $_OR_
+       65   $_SDFFE_PN0P_
+      114   $_SDFF_PN0_
+       79   $_XNOR_
+      137   $_XOR_
+        1 submodules
+        1   $paramod\booth_multiplier\W=s32'00000000000000000000000000100010
+
+=== $paramod\booth_multiplier\W=s32'00000000000000000000000000100010 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     7780 wires
+     7913 wire bits
+        3 public wires
+      136 public wire bits
+        3 ports
+      136 port bits
+     7845 cells
+       68   $_ANDNOT_
+     1302   $_AND_
+       20   $_MUX_
+     4832   $_NAND_
+       43   $_NOR_
+        1   $_NOT_
+       49   $_ORNOT_
+       56   $_OR_
+      140   $_XNOR_
+     1334   $_XOR_
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+    25286 rv32_core
+     2138 mac_unit
+     7845   $paramod\booth_multiplier\W=s32'00000000000000000000000000100010
+
+        +----------Count including submodules.
+        | 
+    22716 wires
+    26500 wire bits
+      153 public wires
+     2802 public wire bits
+       34 ports
+      671 port bits
+        - memories
+        - memory bits
+        - processes
+    25286 cells
+      254   $_ANDNOT_
+     4448   $_AND_
+        4   $_DFFE_PN_
+     1024   $_DFFE_PP_
+       37   $_DFF_P_
+     2204   $_MUX_
+    10237   $_NAND_
+      323   $_NOR_
+      118   $_NOT_
+      564   $_ORNOT_
+      809   $_OR_
+       36   $_SDFFCE_PN0N_
+       64   $_SDFFCE_PP0N_
+       32   $_SDFFE_PN0N_
+      228   $_SDFFE_PN0P_
+        1   $_SDFFE_PP0N_
+       61   $_SDFFE_PP0P_
+        3   $_SDFFE_PP1P_
+      236   $_SDFF_PN0_
+       48   $_SDFF_PP0_
+        3   $_SDFF_PP1_
+      419   $_XNOR_
+     4133   $_XOR_
+        1 submodules
+        1   mac_unit
+

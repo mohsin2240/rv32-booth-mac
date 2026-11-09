@@ -1,0 +1,29 @@
+# ===========================================================================
+# schematics.ys - word-level (RTL) netlists for schematic rendering with
+#                 netlistsvg (https://github.com/nturley/netlistsvg)
+#   Run from the project root:   yosys -s synth/schematics.ys
+#   then: netlistsvg synth/out/<name>.json -o <name>.svg
+# ===========================================================================
+
+# mac_unit top level; the Booth multiplier stays a single block
+read_verilog rtl/booth_multiplier.v rtl/mac_unit.v
+hierarchy -top mac_unit
+proc; opt -full; wreduce; opt_clean -purge
+select mac_unit
+write_json -selected synth/out/sch_mac_unit.json
+
+# Booth multiplier, small instance (W = 6) after elaboration: shows the
+# Booth recoding multiplexers and the partial-product adder chain
+design -reset
+read_verilog rtl/booth_multiplier.v
+chparam -set W 6 booth_multiplier
+hierarchy -top booth_multiplier
+proc; opt -full; wreduce; alumacc; opt_clean -purge
+write_json synth/out/sch_booth_w6.json
+
+# Booth multiplier W = 6 mapped to gates (shows the real gate netlist)
+synth -top booth_multiplier
+abc -g AND,NAND,OR,NOR,XOR,XNOR,ANDNOT,ORNOT,MUX
+opt_clean -purge
+tee -o synth/reports/booth_w6_gates_stat.txt stat
+write_json synth/out/sch_booth_w6_gates.json

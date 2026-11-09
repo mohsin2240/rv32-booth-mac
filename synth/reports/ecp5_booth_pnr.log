@@ -1,0 +1,469 @@
+
+
+Info: Logic utilisation before packing:
+Info:     Total LUT4s:      4828/83640     5%
+Info:         logic LUTs:   4518/83640     5%
+Info:         carry LUTs:    310/83640     0%
+Info:           RAM LUTs:      0/10455     0%
+Info:          RAMW LUTs:      0/20910     0%
+
+Info:      Total DFFs:       371/83640     0%
+
+Info: Packing IOs..
+Info: Packing constants..
+Info: Packing carries...
+Info: Packing LUTs...
+Info: Packing LUT5-7s...
+Info: Packing FFs...
+Info:     129 FFs paired with LUTs.
+Info: Generating derived timing constraints...
+Info: Promoting globals...
+Info:     promoting clock net clk_i$TRELLIS_IO_IN to global network
+Info: Checksum: 0xde0afe90
+
+Info: Device utilisation:
+Info: 	          TRELLIS_IO:     204/    365    55%
+Info: 	                DCCA:       1/     56     1%
+Info: 	              DP16KD:       0/    208     0%
+Info: 	          MULT18X18D:       0/    156     0%
+Info: 	              ALU54B:       0/     78     0%
+Info: 	             EHXPLLL:       0/      4     0%
+Info: 	             EXTREFB:       0/      2     0%
+Info: 	                DCUA:       0/      2     0%
+Info: 	           PCSCLKDIV:       0/      2     0%
+Info: 	             IOLOGIC:       0/    224     0%
+Info: 	            SIOLOGIC:       0/    141     0%
+Info: 	                 GSR:       0/      1     0%
+Info: 	               JTAGG:       0/      1     0%
+Info: 	                OSCG:       0/      1     0%
+Info: 	               SEDGA:       0/      1     0%
+Info: 	                 DTR:       0/      1     0%
+Info: 	             USRMCLK:       0/      1     0%
+Info: 	             CLKDIVF:       0/      4     0%
+Info: 	           ECLKSYNCB:       0/     10     0%
+Info: 	             DLLDELD:       0/      8     0%
+Info: 	              DDRDLL:       0/      4     0%
+Info: 	             DQSBUFM:       0/     14     0%
+Info: 	     TRELLIS_ECLKBUF:       0/      8     0%
+Info: 	        ECLKBRIDGECS:       0/      2     0%
+Info: 	                DCSC:       0/      2     0%
+Info: 	          TRELLIS_FF:     371/  83640     0%
+Info: 	        TRELLIS_COMB:    4854/  83640     5%
+Info: 	        TRELLIS_RAMW:       0/  10455     0%
+
+Info: Placed 0 cells based on constraints.
+Info: Creating initial analytic placement for 2805 cells, random placement wirelen = 333602.
+Info:     at initial placer iter 0, wirelen = 21630
+Info:     at initial placer iter 1, wirelen = 17393
+Info:     at initial placer iter 2, wirelen = 16956
+Info:     at initial placer iter 3, wirelen = 16872
+Info: Running main analytical placer, max placement attempts per cell = 3685612.
+Info:     at iteration #1, type ALL: wirelen solved = 16871, spread = 44095, legal = 44304; time = 0.23s
+Info:     at iteration #2, type ALL: wirelen solved = 18922, spread = 38411, legal = 38899; time = 0.17s
+Info:     at iteration #3, type ALL: wirelen solved = 19684, spread = 37290, legal = 37691; time = 0.17s
+Info:     at iteration #4, type ALL: wirelen solved = 21474, spread = 36361, legal = 36908; time = 0.16s
+Info:     at iteration #5, type ALL: wirelen solved = 23015, spread = 36029, legal = 36566; time = 0.24s
+Info:     at iteration #6, type ALL: wirelen solved = 23639, spread = 36420, legal = 36881; time = 0.26s
+Info:     at iteration #7, type ALL: wirelen solved = 25497, spread = 36675, legal = 37137; time = 0.27s
+Info:     at iteration #8, type ALL: wirelen solved = 26370, spread = 37419, legal = 37785; time = 0.28s
+Info:     at iteration #9, type ALL: wirelen solved = 28154, spread = 36581, legal = 37076; time = 0.28s
+Info:     at iteration #10, type ALL: wirelen solved = 28335, spread = 36712, legal = 37055; time = 0.26s
+Info: HeAP Placer Time: 3.51s
+Info:   of which solving equations: 2.78s
+Info:   of which spreading cells: 0.17s
+Info:   of which strict legalisation: 0.06s
+
+Info: Running simulated annealing placer for refinement.
+Info:   at iteration #1: temp = 0.000000, timing cost = 6595, wirelen = 36566
+Info:   at iteration #5: temp = 0.000000, timing cost = 4862, wirelen = 31739
+Info:   at iteration #10: temp = 0.000000, timing cost = 4240, wirelen = 30588
+Info:   at iteration #15: temp = 0.000000, timing cost = 3963, wirelen = 30014
+Info:   at iteration #20: temp = 0.000000, timing cost = 3993, wirelen = 29828
+Info:   at iteration #25: temp = 0.000000, timing cost = 4076, wirelen = 29765
+Info:   at iteration #25: temp = 0.000000, timing cost = 4066, wirelen = 29784 
+Info: SA placement time 19.50s
+
+Info: Max frequency for clock '$glbnet$clk_i$TRELLIS_IO_IN': 45.35 MHz (FAIL at 100.00 MHz)
+
+Info: Max delay <async>                             -> posedge $glbnet$clk_i$TRELLIS_IO_IN: 15.38 ns
+Info: Max delay posedge $glbnet$clk_i$TRELLIS_IO_IN -> <async>                            : 8.93 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 1 endpoint(s)
+Info:          + represents [1,1) endpoint(s)
+Info: [-12050, -10997) |*********** 
+Info: [-10997,  -9944) |********************** 
+Info: [ -9944,  -8891) |*************** 
+Info: [ -8891,  -7838) |** 
+Info: [ -7838,  -6785) |* 
+Info: [ -6785,  -5732) |**** 
+Info: [ -5732,  -4679) |****************** 
+Info: [ -4679,  -3626) |**************** 
+Info: [ -3626,  -2573) |**************************** 
+Info: [ -2573,  -1520) |***************************************** 
+Info: [ -1520,   -467) |************************************************* 
+Info: [  -467,    586) |********** 
+Info: [   586,   1639) |*** 
+Info: [  1639,   2692) |******************** 
+Info: [  2692,   3745) |*************************** 
+Info: [  3745,   4798) |*********************** 
+Info: [  4798,   5851) |************************** 
+Info: [  5851,   6904) |**************** 
+Info: [  6904,   7957) |*********************** 
+Info: [  7957,   9010) |************************** 
+Info: Checksum: 0x1106b2c1
+Info: Routing globals...
+Info:     routing clock net $glbnet$clk_i$TRELLIS_IO_IN using global 0
+
+Info: Routing..
+Info: Setting up routing queue.
+Info: Routing 21077 arcs.
+Info:            |   (re-)routed arcs  |   delta    | remaining|       time spent     |
+Info:    IterCnt |  w/ripup   wo/ripup |  w/r  wo/r |      arcs| batch(sec) total(sec)|
+Info:       1000 |      354        645 |  354   645 |     20645|       0.64       0.64|
+Info:       2000 |      680       1319 |  326   674 |     20175|       0.44       1.08|
+Info:       3000 |      991       2008 |  311   689 |     19946|       0.46       1.54|
+Info:       4000 |     1288       2711 |  297   703 |     19558|       0.45       2.00|
+Info:       5000 |     1608       3391 |  320   680 |     19275|       0.48       2.48|
+Info:       6000 |     1943       4056 |  335   665 |     18839|       0.46       2.94|
+Info:       7000 |     2245       4754 |  302   698 |     18590|       0.47       3.41|
+Info:       8000 |     2591       5408 |  346   654 |     18222|       0.46       3.87|
+Info:       9000 |     2966       6033 |  375   625 |     17795|       0.47       4.34|
+Info:      10000 |     3324       6675 |  358   642 |     17392|       0.47       4.81|
+Info:      11000 |     3662       7337 |  338   662 |     16946|       0.44       5.25|
+Info:      12000 |     4052       7947 |  390   610 |     16483|       0.48       5.74|
+Info:      13000 |     4433       8566 |  381   619 |     16098|       0.50       6.24|
+Info:      14000 |     4819       9180 |  386   614 |     15759|       0.54       6.78|
+Info:      15000 |     5205       9794 |  386   614 |     15472|       0.53       7.31|
+Info:      16000 |     5639      10360 |  434   566 |     15061|       0.47       7.79|
+Info:      17000 |     6084      10915 |  445   555 |     14699|       0.54       8.32|
+Info:      18000 |     6512      11487 |  428   572 |     14394|       0.54       8.86|
+Info:      19000 |     6912      12087 |  400   600 |     13968|       0.52       9.38|
+Info:      20000 |     7297      12702 |  385   615 |     13685|       0.56       9.94|
+Info:      21000 |     7678      13321 |  381   619 |     13716|       0.57      10.51|
+Info:      22000 |     7989      14010 |  311   689 |     13682|       0.56      11.07|
+Info:      23000 |     8355      14644 |  366   634 |     13197|       0.54      11.61|
+Info:      24000 |     8805      15194 |  450   550 |     12875|       0.60      12.21|
+Info:      25000 |     9250      15749 |  445   555 |     12490|       0.54      12.75|
+Info:      26000 |     9707      16292 |  457   543 |     12167|       0.51      13.26|
+Info:      27000 |    10122      16877 |  415   585 |     11726|       0.49      13.75|
+Info:      28000 |    10616      17383 |  494   506 |     11362|       0.49      14.24|
+Info:      29000 |    11087      17912 |  471   529 |     10968|       0.49      14.73|
+Info:      30000 |    11608      18391 |  521   479 |     10607|       0.50      15.23|
+Info:      31000 |    12089      18910 |  481   519 |     10250|       0.51      15.74|
+Info:      32000 |    12572      19427 |  483   517 |      9899|       0.49      16.23|
+Info:      33000 |    13055      19944 |  483   517 |      9477|       0.46      16.69|
+Info:      34000 |    13580      20419 |  525   475 |      9087|       0.48      17.16|
+Info:      35000 |    14125      20874 |  545   455 |      8795|       0.44      17.61|
+Info:      36000 |    14694      21305 |  569   431 |      8605|       0.46      18.06|
+Info:      37000 |    15289      21710 |  595   405 |      8365|       0.47      18.54|
+Info:      38000 |    15903      22096 |  614   386 |      8145|       0.50      19.04|
+Info:      39000 |    16546      22453 |  643   357 |      7866|       0.46      19.50|
+Info:      40000 |    17145      22854 |  599   401 |      7601|       0.48      19.98|
+Info:      41000 |    17761      23238 |  616   384 |      7316|       0.47      20.45|
+Info:      42000 |    18351      23648 |  590   410 |      7010|       0.45      20.90|
+Info:      43000 |    18908      24091 |  557   443 |      6704|       0.42      21.33|
+Info:      44000 |    19458      24541 |  550   450 |      6443|       0.47      21.80|
+Info:      45000 |    19965      25034 |  507   493 |      6165|       0.50      22.30|
+Info:      46000 |    20444      25547 |  479   513 |      5917|       0.52      22.81|
+Info:      47000 |    20872      25991 |  428   444 |      5395|       0.38      23.19|
+Info:      48000 |    21225      26393 |  353   402 |      4814|       0.30      23.49|
+Info:      49000 |    21596      26801 |  371   408 |      4249|       0.31      23.80|
+Info:      50000 |    22036      27197 |  440   396 |      3768|       0.35      24.15|
+Info:      51000 |    22514      27556 |  478   359 |      3324|       0.39      24.54|
+Info:      52000 |    23033      27892 |  519   336 |      2885|       0.39      24.94|
+Info:      53000 |    23530      28260 |  497   368 |      2423|       0.39      25.33|
+Info:      54000 |    24034      28651 |  504   391 |      2008|       0.40      25.73|
+Info:      55000 |    24511      29070 |  477   419 |      1664|       0.42      26.16|
+Info:      56000 |    24908      29565 |  397   495 |      1105|       0.38      26.54|
+Info:      57000 |    25097      30239 |  189   674 |       314|       0.51      27.05|
+Info:      57323 |    25103      30502 |    6   263 |         0|       0.36      27.41|
+Info: Routing complete.
+Info: Router1 time 27.41s
+Info: Checksum: 0xe036ac6a
+
+Info: Critical path report for clock '$glbnet$clk_i$TRELLIS_IO_IN' (posedge -> posedge):
+Info:       type curr  total name
+Info:   clk-to-q  0.52  0.52 Source u_mac.op_a_TRELLIS_FF_Q_5.Q
+Info:    routing  1.52  2.05 Net u_mac.op_a[5] (41,35) -> (52,33)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_A1_LUT4_Z.D
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:108.23-108.24
+Info:      logic  0.24  2.29 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_A1_LUT4_Z.F
+Info:    routing  1.11  3.40 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_A1 (52,33) -> (52,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT$CCU2_COMB1.A
+Info:      logic  0.45  3.85 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT$CCU2_COMB1.FCO
+Info:    routing  0.00  3.85 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_CIN (52,31) -> (53,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  3.92 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  3.92 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_FCI_INT (53,31) -> (53,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  3.92 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  3.92 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_COUT (53,31) -> (53,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  3.99 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  3.99 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_FCI_INT (53,31) -> (53,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  3.99 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  3.99 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_COUT (53,31) -> (53,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.06 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCO
+Info:    routing  0.00  4.06 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_FCI_INT (53,31) -> (53,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCI
+Info:      logic  0.00  4.06 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCO
+Info:    routing  0.00  4.06 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT_CIN (53,31) -> (53,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.13 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT$CCU2_COMB0.FCO
+Info:    routing  0.00  4.13 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT$CCU2_FCI_INT (53,31) -> (53,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT$CCU2_COMB1.FCI
+Info:      logic  0.00  4.13 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN_CCU2C_COUT$CCU2_COMB1.FCO
+Info:    routing  0.00  4.13 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_CIN (53,31) -> (54,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.20 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  4.20 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_FCI_INT (54,31) -> (54,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  4.20 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  4.20 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_COUT (54,31) -> (54,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.27 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  4.27 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_FCI_INT (54,31) -> (54,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  4.27 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  4.27 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_S0_CCU2C_S1_COUT (54,31) -> (54,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.34 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  4.34 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_FCI_INT (54,31) -> (54,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  4.34 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  4.34 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_S0_CCU2C_S1_COUT (54,31) -> (54,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.41 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  4.41 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_FCI_INT (54,31) -> (54,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  4.41 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  4.41 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_S0_CCU2C_S1_COUT (54,31) -> (55,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.49 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCO
+Info:    routing  0.00  4.49 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_FCI_INT (55,31) -> (55,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCI
+Info:      logic  0.00  4.49 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCO
+Info:    routing  0.00  4.49 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN (55,31) -> (55,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.56 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCO
+Info:    routing  0.00  4.56 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_FCI_INT (55,31) -> (55,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCI
+Info:      logic  0.00  4.56 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCO
+Info:    routing  0.00  4.56 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN (55,31) -> (55,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.63 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCO
+Info:    routing  0.00  4.63 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_FCI_INT (55,31) -> (55,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCI
+Info:      logic  0.00  4.63 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCO
+Info:    routing  0.00  4.63 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT_CIN (55,31) -> (55,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.70 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB0.FCO
+Info:    routing  0.00  4.70 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_FCI_INT (55,31) -> (55,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCI
+Info:      logic  0.00  4.70 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN_CCU2C_COUT$CCU2_COMB1.FCO
+Info:    routing  0.00  4.70 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT_CIN (55,31) -> (56,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  4.77 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT$CCU2_COMB0.FCO
+Info:    routing  0.00  4.77 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT$CCU2_FCI_INT (56,31) -> (56,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT$CCU2_COMB1.FCI
+Info:      logic  0.00  4.77 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN_CCU2C_COUT$CCU2_COMB1.FCO
+Info:    routing  0.00  4.77 Net u_mac.funct3_LUT4_D_Z_CCU2C_S0_CIN (56,31) -> (56,31)
+Info:                          Sink u_mac.funct3_LUT4_D_Z_CCU2C_S0$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.44  5.21 Source u_mac.funct3_LUT4_D_Z_CCU2C_S0$CCU2_COMB0.F
+Info:    routing  1.76  6.97 Net u_mac.funct3_LUT4_D_Z[4] (56,31) -> (61,13)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_18_DI_CCU2C_S1_A1_LUT4_Z_D_L6MUX21_Z_SD_LUT4_A_Z_PFUMX_BLUT_Z_LUT4_Z_1_D_LUT4_D_Z_LUT4_Z_1_B_LUT4_Z_B_PFUMX_Z_ALUT_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.M
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:108.23-108.24
+Info:      logic  0.26  7.22 Source u_mac.prod_ext_TRELLIS_FF_Q_18_DI_CCU2C_S1_A1_LUT4_Z_D_L6MUX21_Z_SD_LUT4_A_Z_PFUMX_BLUT_Z_LUT4_Z_1_D_LUT4_D_Z_LUT4_Z_1_B_LUT4_Z_B_PFUMX_Z_ALUT_LUT4_Z_D_LUT4_D_Z_L6MUX21_Z_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:    routing  1.15  8.37 Net u_mac.prod_ext_TRELLIS_FF_Q_18_DI_CCU2C_S1_A1_LUT4_Z_D_L6MUX21_Z_SD_LUT4_A_Z_PFUMX_BLUT_Z_LUT4_Z_1_D_LUT4_D_Z_LUT4_Z_1_B_LUT4_Z_B_PFUMX_Z_ALUT_LUT4_Z_D_LUT4_D_Z[1] (61,13) -> (62,17)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A_Z_PFUMX_ALUT_Z_PFUMX_Z_BLUT_LUT4_Z_D_PFUMX_C0_Z_LUT4_Z_3_D_LUT4_D_Z_LUT4_Z_D_LUT4_D_Z_LUT4_Z_C_LUT4_D_Z_LUT4_Z_1.D
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:108.23-108.24
+Info:      logic  0.24  8.61 Source u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A_Z_PFUMX_ALUT_Z_PFUMX_Z_BLUT_LUT4_Z_D_PFUMX_C0_Z_LUT4_Z_3_D_LUT4_D_Z_LUT4_Z_D_LUT4_D_Z_LUT4_Z_C_LUT4_D_Z_LUT4_Z_1.F
+Info:    routing  1.65  10.26 Net u_mac.prod_ext_TRELLIS_FF_Q_14_DI_CCU2C_S1_A1_PFUMX_Z_C0_L6MUX21_Z_D0_L6MUX21_Z_D0_PFUMX_Z_BLUT_LUT4_Z_B[0] (62,17) -> (65,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A_Z_PFUMX_ALUT_Z_PFUMX_Z_BLUT_LUT4_Z_D_PFUMX_C0_Z_LUT4_Z_3_D_LUT4_D_Z_LUT4_Z_D_LUT4_D_Z_LUT4_Z_C_LUT4_Z_C_LUT4_C_Z_LUT4_Z_B_LUT4_A_Z_LUT4_D_Z_LUT4_D_Z_LUT4_Z_2.C
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:108.23-108.24
+Info:      logic  0.24  10.49 Source u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A_Z_PFUMX_ALUT_Z_PFUMX_Z_BLUT_LUT4_Z_D_PFUMX_C0_Z_LUT4_Z_3_D_LUT4_D_Z_LUT4_Z_D_LUT4_D_Z_LUT4_Z_C_LUT4_Z_C_LUT4_C_Z_LUT4_Z_B_LUT4_A_Z_LUT4_D_Z_LUT4_D_Z_LUT4_Z_2.F
+Info:    routing  1.10  11.60 Net u_mac.prod_ext_TRELLIS_FF_Q_5_DI_CCU2C_S1_A0_PFUMX_Z_C0_PFUMX_Z_BLUT_LUT4_Z_D[1] (65,21) -> (65,26)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.D
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:108.23-108.24
+Info:      logic  0.24  11.83 Source u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.F
+Info:    routing  0.00  11.83 Net u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D1_PFUMX_Z_ALUT (65,26) -> (65,26)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.F1
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:157.46-157.48
+Info:      logic  0.17  12.00 Source u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D1_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:    routing  0.00  12.00 Net u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D1 (65,26) -> (65,26)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.FXB
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:157.62-157.64
+Info:      logic  0.24  12.24 Source u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D1_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:    routing  0.00  12.24 Net u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1 (65,26) -> (65,26)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.FXB
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:157.70-157.72
+Info:      logic  0.24  12.48 Source u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_L6MUX21_Z_D1_L6MUX21_Z_D0_PFUMX_Z_ALUT_LUT4_Z.OFX
+Info:    routing  0.86  13.34 Net u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C[0] (65,26) -> (65,25)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A.A
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:108.23-108.24
+Info:      logic  0.24  13.58 Source u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A.F
+Info:    routing  0.00  13.58 Net u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A_Z (65,25) -> (65,25)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A_Z_PFUMX_ALUT_BLUT_LUT4_Z.F1
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:133.22-133.24
+Info:      logic  0.17  13.74 Source u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A_Z_PFUMX_ALUT_BLUT_LUT4_Z.OFX
+Info:    routing  0.71  14.46 Net u_mac.prod_ext_TRELLIS_FF_Q_9_DI_CCU2C_S1_A1_LUT4_Z_C_LUT4_A_Z_PFUMX_ALUT_Z[4] (65,25) -> (63,26)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1_A0_PFUMX_Z_BLUT_LUT4_Z.M
+Info:                          Defined in:
+Info:                               /share/lattice/cells_map_trellis.v:108.23-108.24
+Info:      logic  0.26  14.71 Source u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1_A0_PFUMX_Z_BLUT_LUT4_Z.OFX
+Info:    routing  1.76  16.47 Net u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1_A0 (63,26) -> (54,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1$CCU2_COMB0.A
+Info:      logic  0.45  16.92 Source u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  16.92 Net u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1$CCU2_FCI_INT (54,21) -> (54,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  16.92 Source u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  16.92 Net u_mac.prod_ext_TRELLIS_FF_Q_7_DI_CCU2C_S1_COUT (54,21) -> (54,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_5_DI_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  16.99 Source u_mac.prod_ext_TRELLIS_FF_Q_5_DI_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  16.99 Net u_mac.prod_ext_TRELLIS_FF_Q_5_DI_CCU2C_S1$CCU2_FCI_INT (54,21) -> (54,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_5_DI_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  16.99 Source u_mac.prod_ext_TRELLIS_FF_Q_5_DI_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  16.99 Net u_mac.prod_ext_TRELLIS_FF_Q_5_DI_CCU2C_S1_COUT (54,21) -> (54,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_3_DI_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  17.06 Source u_mac.prod_ext_TRELLIS_FF_Q_3_DI_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  17.06 Net u_mac.prod_ext_TRELLIS_FF_Q_3_DI_CCU2C_S1$CCU2_FCI_INT (54,21) -> (54,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_3_DI_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  17.06 Source u_mac.prod_ext_TRELLIS_FF_Q_3_DI_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  17.06 Net u_mac.prod_ext_TRELLIS_FF_Q_3_DI_CCU2C_S1_COUT (54,21) -> (54,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_1_DI_CCU2C_S1$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  17.13 Source u_mac.prod_ext_TRELLIS_FF_Q_1_DI_CCU2C_S1$CCU2_COMB0.FCO
+Info:    routing  0.00  17.13 Net u_mac.prod_ext_TRELLIS_FF_Q_1_DI_CCU2C_S1$CCU2_FCI_INT (54,21) -> (54,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_1_DI_CCU2C_S1$CCU2_COMB1.FCI
+Info:      logic  0.00  17.13 Source u_mac.prod_ext_TRELLIS_FF_Q_1_DI_CCU2C_S1$CCU2_COMB1.FCO
+Info:    routing  0.00  17.13 Net u_mac.prod_ext_TRELLIS_FF_Q_1_DI_CCU2C_S1_COUT (54,21) -> (55,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_DI_CCU2C_S0$CCU2_COMB0.FCI
+Info:                          Defined in:
+Info:                               /share/lattice/arith_map_ccu2c.v:74.7-80.4
+Info:                               /share/lattice/ccu2c_sim.vh:9.9-9.13
+Info:      logic  0.07  17.20 Source u_mac.prod_ext_TRELLIS_FF_Q_DI_CCU2C_S0$CCU2_COMB0.FCO
+Info:    routing  0.00  17.20 Net u_mac.prod_ext_TRELLIS_FF_Q_DI_CCU2C_S0$CCU2_FCI_INT (55,21) -> (55,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_DI_CCU2C_S0$CCU2_COMB1.FCI
+Info:      logic  0.40  17.60 Source u_mac.prod_ext_TRELLIS_FF_Q_DI_CCU2C_S0$CCU2_COMB1.F
+Info:    routing  0.13  17.73 Net u_mac.prod_ext_TRELLIS_FF_Q_DI_CCU2C_S0_S1 (55,21) -> (55,21)
+Info:                          Sink u_mac.prod_ext_TRELLIS_FF_Q_10.DI
+Info:      setup  0.00  17.73 Source u_mac.prod_ext_TRELLIS_FF_Q_10.DI
+Info: 5.98 ns logic, 11.76 ns routing
+
+Info: Critical path report for cross-domain path '<async>' -> 'posedge $glbnet$clk_i$TRELLIS_IO_IN':
+Info:       type curr  total name
+Info:     source  0.00  0.00 Source rst_ni$tr_io.O
+Info:    routing  2.07  2.07 Net rst_ni$TRELLIS_IO_IN (0,50) -> (22,42)
+Info:                          Sink rst_ni_LUT4_D.D
+Info:                          Defined in:
+Info:                               rtl/mac_unit.v:74.24-74.30
+Info:      logic  0.24  2.31 Source rst_ni_LUT4_D.F
+Info:    routing  6.77  9.08 Net rst_ni_LUT4_D_Z (22,42) -> (115,71)
+Info:                          Sink u_mac.s1_rd_TRELLIS_FF_Q_2.LSR
+Info:      setup  0.42  9.51 Source u_mac.s1_rd_TRELLIS_FF_Q_2.LSR
+Info: 0.66 ns logic, 8.85 ns routing
+
+Info: Critical path report for cross-domain path 'posedge $glbnet$clk_i$TRELLIS_IO_IN' -> '<async>':
+Info:       type curr  total name
+Info:   clk-to-q  0.52  0.52 Source ovf_o_TRELLIS_FF_Q.Q
+Info:    routing  5.21  5.74 Net ovf_o$TRELLIS_IO_OUT (66,50) -> (110,95)
+Info:                          Sink ovf_o$tr_io.I
+Info:                          Defined in:
+Info:                               synth/fmax_wrapper.v:26.24-26.29
+Info: 0.52 ns logic, 5.21 ns routing
+
+Warning: Max frequency for clock '$glbnet$clk_i$TRELLIS_IO_IN': 56.39 MHz (FAIL at 100.00 MHz)
+
+Info: Max delay <async>                             -> posedge $glbnet$clk_i$TRELLIS_IO_IN: 9.51 ns
+Info: Max delay posedge $glbnet$clk_i$TRELLIS_IO_IN -> <async>                            : 5.74 ns
+
+Info: Slack histogram:
+Info:  legend: * represents 1 endpoint(s)
+Info:          + represents [1,1) endpoint(s)
+Info: [ -7733,  -6893) |******************** 
+Info: [ -6893,  -6053) |****************** 
+Info: [ -6053,  -5213) |************ 
+Info: [ -5213,  -4373) |** 
+Info: [ -4373,  -3533) |** 
+Info: [ -3533,  -2693) |** 
+Info: [ -2693,  -1853) |********* 
+Info: [ -1853,  -1013) |****************************** 
+Info: [ -1013,   -173) |****************************************** 
+Info: [  -173,    667) |******************* 
+Info: [   667,   1507) |** 
+Info: [  1507,   2347) |************************** 
+Info: [  2347,   3187) |**************************** 
+Info: [  3187,   4027) |********** 
+Info: [  4027,   4867) |**************************** 
+Info: [  4867,   5707) |********************** 
+Info: [  5707,   6547) |****************************** 
+Info: [  6547,   7387) |*********************** 
+Info: [  7387,   8227) |************************* 
+Info: [  8227,   9067) |******************************* 
+
+1 warning, 0 errors
+
+Info: Program finished normally.

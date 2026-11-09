@@ -1,1 +1,28 @@
-build_index.py
+# Simulator outputs: regenerate with run_sim.sh / sw/run_cpu_sims.py
+*.vvp
+*.vcd
+sim/cpu/*.trace.csv
+
+# Synthesis outputs: regenerate with run_synth.sh
+synth/out/
+synth/reports/*_yosys.log
+
+# Program images and golden data: regenerate with python sw/build.py
+build/
+
+# LaTeX build files
+report/*.log
+report/*.aux
+report/*.toc
+report/*.lof
+report/*.lot
+report/*.out
+
+# Artifact copy of the page; the GitHub Pages copy is docs/index.html
+report/web/rv32_booth_mac.html
+
+# Old stand-alone Pages folder (superseded by docs/)
+pages/
+
+__pycache__/
+*.pyc

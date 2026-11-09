@@ -1,0 +1,13 @@
+====================================================================
+ RISC-V SoC simulation : isa_test
+====================================================================
+  halted=1  error=0  timeout=0  a0=0x0000600d (PASS code)
+  cycles            : 348
+  instructions      : 300
+  CPI               : 1.160
+  load/MAC-use stalls: 8
+  taken branch flushes: 18
+  MAC instructions  : 22
+  >>> PASS <<<
+RESULT name=isa_test status=PASS cycles=348 instret=300 stalls=8 flushes=18 macs=22 a0=600d errors=0
+tb/tb_riscv_soc.v:186: $finish called at 3520000 (1ps)

@@ -1,0 +1,43 @@
+# ===========================================================================
+# synth_generic.ys - technology-independent (ASIC-style) synthesis
+#   Run from the project root:   yosys -s synth/synth_generic.ys
+#
+#   Gate library : 2-input CMOS-style cells mapped by ABC
+#                  (AND/NAND/OR/NOR/XOR/XNOR/ANDNOT/ORNOT/MUX/NOT + D-FFs)
+#
+#   Run 1 : hierarchical  -> per-module gate counts
+#   Run 2 : flattened     -> total area, transistor estimate, logic depth,
+#                            gate-level netlist for post-synthesis simulation
+#   Run 3 : comparison    -> booth_multiplier replaced by native '*' and
+#                            Yosys' own Booth + Wallace-tree generator
+#                            (synth -booth), to compare logic depth
+# ===========================================================================
+
+# ---------------- Run 1: hierarchical gate counts ----------------
+read_verilog rtl/booth_multiplier.v rtl/mac_unit.v
+synth -top mac_unit
+abc -g AND,NAND,OR,NOR,XOR,XNOR,ANDNOT,ORNOT,MUX
+opt_clean -purge
+tee -o synth/reports/generic_hier_stat.txt stat
+
+# ---------------- Run 2: flattened design (the deliverable) -------
+design -reset
+read_verilog rtl/booth_multiplier.v rtl/mac_unit.v
+synth -top mac_unit -flatten
+abc -g AND,NAND,OR,NOR,XOR,XNOR,ANDNOT,ORNOT,MUX
+opt_clean -purge
+check -assert
+tee -o synth/reports/generic_stat.txt stat
+tee -o synth/reports/generic_stat_cmos.txt stat -tech cmos
+# Longest topological path through combinational cells (= logic depth)
+tee -o synth/reports/generic_ltp.txt ltp -noff
+write_verilog -noattr synth/out/mac_unit_netlist.v
+
+# ---------------- Run 3: Yosys Booth + Wallace tree (comparison) --
+design -reset
+read_verilog synth/native_multiplier.v rtl/mac_unit.v
+synth -top mac_unit -flatten -booth
+abc -g AND,NAND,OR,NOR,XOR,XNOR,ANDNOT,ORNOT,MUX
+opt_clean -purge
+tee -o synth/reports/generic_wallace_stat.txt stat
+tee -o synth/reports/generic_wallace_ltp.txt ltp -noff
