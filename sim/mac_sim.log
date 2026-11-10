@@ -158,4 +158,4 @@ VCD info: dumpfile mac_unit.vcd opened for output.
    errors              : 0
    >>> ALL TESTS PASSED <<<
 ====================================================================
-..\tb\tb_mac_unit.v:648: $finish called at 47070000 (1ps)
+../tb/tb_mac_unit.v:653: $finish called at 47070000 (1ps)

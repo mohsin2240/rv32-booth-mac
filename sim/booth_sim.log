@@ -24,4 +24,4 @@
    errors           : 0
    >>> ALL TESTS PASSED <<<
 ====================================================================
-..\tb\tb_booth_multiplier.v:110: $finish called at 85545000 (1ps)
+../tb/tb_booth_multiplier.v:115: $finish called at 85545000 (1ps)
